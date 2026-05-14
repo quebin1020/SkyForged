@@ -1,0 +1,13 @@
+{
+  "itemGroup.skyforge": "Example Mod Tab",
+  "block.skyforge.example_block": "Example Block",
+  "item.skyforge.example_item": "Example Item",
+
+  "skyforge.configuration.title": "SkyForge Configs",
+  "skyforge.configuration.section.skyforge.common.toml": "SkyForge Configs",
+  "skyforge.configuration.section.skyforge.common.toml.title": "SkyForge Configs",
+  "skyforge.configuration.items": "Item List",
+  "skyforge.configuration.logDirtBlock": "Log Dirt Block",
+  "skyforge.configuration.magicNumberIntroduction": "Magic Number Text",
+  "skyforge.configuration.magicNumber": "Magic Number"
+}
