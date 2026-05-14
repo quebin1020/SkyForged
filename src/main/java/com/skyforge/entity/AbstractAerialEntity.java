@@ -24,20 +24,22 @@ public abstract class AbstractAerialEntity extends Mob {
     @Override
     public void tick() {
         super.tick();
+        if (!level().isClientSide()){
+            if (targeting != null)
+                targeting.tick();
 
-        if (targeting != null)
-            targeting.tick();
+            if (brain != null)
+                brain.tick();
 
-        if (brain != null)
-            brain.tick();
+            if (movement != null)
+                movement.tick();
 
-        if (movement != null)
-            movement.tick();
+            if (attack != null)
+                attack.tick();
 
-        if (attack != null)
-            attack.tick();
+            this.move(MoverType.SELF, this.getDeltaMovement());
+        }
 
-        this.move(MoverType.SELF, this.getDeltaMovement());
     }
 
     public FlightMovementController getMovementController() {
