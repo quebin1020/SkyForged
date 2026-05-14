@@ -1,3 +1,4 @@
+/*
 package com.skyforge.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -38,5 +39,135 @@ public class DebugHelicopterRenderer extends EntityRenderer<DebugHelicopterEntit
                 SkyforgeMod.MOD_ID,
                 "textures/entity/debug_helicopter.png"
         );
+    }
+}
+*/
+package com.skyforge.render;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
+import com.skyforge.entity.DebugHelicopterEntity;
+
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+
+public class DebugHelicopterRenderer
+        extends EntityRenderer<DebugHelicopterEntity> {
+
+    public DebugHelicopterRenderer(EntityRendererProvider.Context context) {
+        super(context);
+    }
+
+    @Override
+    public void render(
+            DebugHelicopterEntity entity,
+            float entityYaw,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffer,
+            int packedLight
+    ) {
+
+        poseStack.pushPose();
+
+
+        poseStack.mulPose(
+                Axis.YP.rotationDegrees(-Mth.lerp(partialTick, entity.yRotO, entity.getYRot()))
+        );
+
+        VertexConsumer vertex =
+                buffer.getBuffer(RenderType.lines());
+
+        float halfWidth = 0.5f;
+        float halfHeight = 0.25f;
+        float halfLength = 1.0f;
+
+        drawBox(
+                poseStack,
+                vertex,
+                halfWidth,
+                halfHeight,
+                halfLength
+        );
+
+        poseStack.popPose();
+
+        super.render(
+                entity,
+                entityYaw,
+                partialTick,
+                poseStack,
+                buffer,
+                packedLight
+        );
+    }
+
+    private void drawBox(
+            PoseStack poseStack,
+            VertexConsumer vertex,
+            float hw,
+            float hh,
+            float hl
+    ) {
+
+        PoseStack.Pose pose = poseStack.last();
+
+        line(vertex, pose, -hw, -hh, -hl, hw, -hh, -hl);
+        line(vertex, pose, hw, -hh, -hl, hw, -hh, hl);
+        line(vertex, pose, hw, -hh, hl, -hw, -hh, hl);
+        line(vertex, pose, -hw, -hh, hl, -hw, -hh, -hl);
+
+        line(vertex, pose, -hw, hh, -hl, hw, hh, -hl);
+        line(vertex, pose, hw, hh, -hl, hw, hh, hl);
+        line(vertex, pose, hw, hh, hl, -hw, hh, hl);
+        line(vertex, pose, -hw, hh, hl, -hw, hh, -hl);
+
+        line(vertex, pose, -hw, -hh, -hl, -hw, hh, -hl);
+        line(vertex, pose, hw, -hh, -hl, hw, hh, -hl);
+        line(vertex, pose, hw, -hh, hl, hw, hh, hl);
+        line(vertex, pose, -hw, -hh, hl, -hw, hh, hl);
+    }
+
+    private void line(
+            VertexConsumer vertex,
+            PoseStack.Pose pose,
+            float x1,
+            float y1,
+            float z1,
+            float x2,
+            float y2,
+            float z2
+    ) {
+
+        vertex.addVertex(
+                        pose.pose(),
+                        x1,
+                        y1,
+                        z1
+                )
+                .setColor(255, 0, 0, 255)
+                .setNormal(0, 1, 0);
+
+        vertex.addVertex(
+                        pose.pose(),
+                        x2,
+                        y2,
+                        z2
+                )
+                .setColor(255, 255, 255, 255)
+                .setNormal(0, 1, 0);
+    }
+
+    @Override
+    public ResourceLocation getTextureLocation(
+            DebugHelicopterEntity entity
+    ) {
+        return null;
     }
 }
