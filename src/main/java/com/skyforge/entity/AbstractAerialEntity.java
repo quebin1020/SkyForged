@@ -46,4 +46,8 @@ public abstract class AbstractAerialEntity extends Mob {
     public FlightMovementController getMovementController() {
         return movement;
     }
+
+    public TargetingSystem getTargetingSystem() {
+        return targeting;
+    }
 }

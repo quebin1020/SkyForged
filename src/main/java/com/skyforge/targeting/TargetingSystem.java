@@ -35,7 +35,25 @@ public class TargetingSystem {
 
         if(nearbyPlayers.isEmpty()) return;
 
-        currentTarget = nearbyPlayers.getFirst();
+        Player closest = null;
+
+        double closestDistance = Double.MAX_VALUE;
+
+        for(Player player : nearbyPlayers) {
+
+            double distance =
+                    entity.position()
+                            .distanceTo(player.position());
+
+            if(distance < closestDistance) {
+
+                closestDistance = distance;
+
+                closest = player;
+            }
+        }
+
+        currentTarget = closest;
     }
 
     protected void validateTarget() {

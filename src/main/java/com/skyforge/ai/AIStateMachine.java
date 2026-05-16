@@ -24,7 +24,6 @@ public class AIStateMachine {
 
     protected PatrolNavigator patrolNavigator;
 
-    protected LivingEntity target;
 
     protected int stateTicks;
 
@@ -64,7 +63,9 @@ public class AIStateMachine {
 
 
     protected void updateStateTransitions() {
-
+        LivingEntity target =
+                entity.getTargetingSystem()
+                        .getTarget();
         if(target == null) {
 
             setState(AIState.PATROL);
