@@ -19,9 +19,7 @@ public abstract class FlightMovementController {
 
     public void tick() {
 
-        if (targetPosition == null)
-            return;
-
+        if (targetPosition == null) return;
         rotateTowardTarget();
         applyMovement();
         applyDrag();
@@ -44,13 +42,21 @@ public abstract class FlightMovementController {
 
     protected void applyMovement() {
 
-        Vec3 forward = entity.getLookAngle();
+        Vec3 toTarget = targetPosition.subtract(entity.position()).normalize();
+
+        Vec3 forward = entity.getLookAngle().normalize();
+
+        double alignment = forward.dot(toTarget);
+
+        alignment = Math.max(0, alignment);
 
         Vec3 velocity = entity.getDeltaMovement();
 
-        velocity = velocity.add(forward.scale(config.acceleration));
+        velocity = velocity.add(forward.scale(config.acceleration * alignment));
 
-        if (velocity.length() > config.maxSpeed) {
+        double speed = velocity.length();
+
+        if (speed > config.maxSpeed) {
             velocity = velocity.normalize().scale(config.maxSpeed);
         }
 
