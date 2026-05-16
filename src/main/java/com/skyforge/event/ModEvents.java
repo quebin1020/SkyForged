@@ -1,5 +1,4 @@
 package com.skyforge.event;
-
 import com.skyforge.entity.DebugHelicopterEntity;
 import com.skyforge.entity.ModEntities;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;

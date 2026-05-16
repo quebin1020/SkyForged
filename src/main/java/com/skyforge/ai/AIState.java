@@ -7,6 +7,7 @@ public enum AIState {
     SEARCH,
     CHASE,
     INTERCEPT,
+    ATTACK,
     ATTACK_RUN,
     EVADE,
     RETREAT,

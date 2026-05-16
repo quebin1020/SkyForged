@@ -4,6 +4,7 @@ import com.skyforge.SkyforgeMod;
 import com.skyforge.ai.AIStateMachine;
 import com.skyforge.attack.MachineGunAttack;
 import com.skyforge.config.FlightConfig;
+import com.skyforge.config.PatrolPresets;
 import com.skyforge.movement.HelicopterMovement;
 import com.skyforge.targeting.TargetingSystem;
 
@@ -46,7 +47,7 @@ public class DebugHelicopterEntity extends AbstractAerialEntity {
 
         this.targeting = new TargetingSystem(this);
 
-        this.brain = new AIStateMachine(this);
+        this.brain = new AIStateMachine(this, PatrolPresets.helicopter());
     }
 
     public static AttributeSupplier.Builder createAttributes() {
