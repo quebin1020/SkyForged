@@ -3,6 +3,8 @@ package com.skyforge.ai;
 import com.skyforge.entity.AbstractAerialEntity;
 import net.minecraft.world.phys.Vec3;
 
+import static com.skyforge.SkyforgeMod.LOGGER1;
+
 public class AIStateMachine {
 
     protected Vec3 patrolTarget;
@@ -40,9 +42,11 @@ public class AIStateMachine {
                     entity.getRandom().nextInt(10) - 5,
                     entity.getRandom().nextInt(40) - 20
             );
+            LOGGER1.info("setting new targetpoint");
         }
 
         entity.getMovementController().setTargetPosition(patrolTarget);
+
     }
 
     protected void chaseTick() {
@@ -61,4 +65,6 @@ public class AIStateMachine {
     public AIState getState() {
         return currentState;
     }
+
+    public Vec3 getPatrolTarget(){ return patrolTarget;}
 }

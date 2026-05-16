@@ -4,6 +4,7 @@ import com.skyforge.ai.AIStateMachine;
 import com.skyforge.attack.AttackController;
 import com.skyforge.movement.FlightMovementController;
 import com.skyforge.targeting.TargetingSystem;
+import com.skyforge.util.DebugRender;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MoverType;
