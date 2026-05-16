@@ -10,18 +10,19 @@ import static com.skyforge.SkyforgeMod.LOGGER1;
 
 public class DebugRender {
     public static void drawLine(Level level, Vec3 vstart, Vec3 vend){
-        if (!level.isClientSide()) return;
-        LOGGER1.info("vector: " + vstart.x + vstart.y + vstart.z);
+/*        if (!level.isClientSide()) return;
         for (int i = 0;i <= 20;i++){
-            double t = i/20;
+            double t = i / 20 ;
             Vec3 p = vstart.lerp(vend,t);
+            LOGGER1.info("a");
 
             level.addParticle(
                     ParticleTypes.END_ROD,
                     p.x,p.y,p.z,
                     0,0,0
             );
-
         }
+*/
+
     }
 }

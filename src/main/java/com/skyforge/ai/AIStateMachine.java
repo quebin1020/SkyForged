@@ -18,7 +18,7 @@ public class AIStateMachine {
     }
 
     public void tick() {
-
+        if (this.entity.level().isClientSide()) return;
         switch (currentState) {
 
             case IDLE -> idleTick();
@@ -34,8 +34,7 @@ public class AIStateMachine {
 
     protected void patrolTick() {
 
-        if (patrolTarget == null ||
-                entity.position().distanceTo(patrolTarget) < 3) {
+        if (patrolTarget == null || entity.position().distanceTo(patrolTarget) < 3) {
 
             patrolTarget = entity.position().add(
                     entity.getRandom().nextInt(40) - 20,
