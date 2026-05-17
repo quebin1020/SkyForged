@@ -73,10 +73,9 @@ public class AIStateMachine {
             return;
         }
 
-        double distance =
-                entity.position().distanceTo(
+        double distance = entity.position().distanceTo(
                         target.position()
-                );
+        );
 
         switch(currentState) {
 
@@ -132,7 +131,20 @@ public class AIStateMachine {
         return currentState;
     }
 
-    private void attackTick() {
+    protected void attackTick() {
+
+        LivingEntity target = entity.getTargetingSystem()
+                .getTarget();
+
+        if(target == null) return;
+
+        Vec3 attackPosition = entity.getCombatBehavior().getAttackPosition(target);
+
+        entity.getMovementController()
+                        .setTargetPosition(
+                        attackPosition
+                );
+
     }
 
     protected void idleTick() {
@@ -152,6 +164,16 @@ public class AIStateMachine {
     }
 
     protected void chaseTick() {
+
+        LivingEntity target = entity.getTargetingSystem()
+                .getTarget();
+
+        if(target == null) return;
+
+        entity.getMovementController()
+                .setTargetPosition(
+                        target.position()
+                );
     }
 
     protected void attackRunTick() {

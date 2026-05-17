@@ -2,7 +2,8 @@ package com.skyforge.entity;
 
 import com.skyforge.SkyforgeMod;
 import com.skyforge.ai.AIStateMachine;
-import com.skyforge.attack.MachineGunAttack;
+import com.skyforge.ai.combat.HelicopterCombatBehavior;
+import com.skyforge.attack.HelicopterAttackController;
 import com.skyforge.config.FlightConfig;
 import com.skyforge.config.PatrolPresets;
 import com.skyforge.movement.HelicopterMovement;
@@ -18,6 +19,7 @@ import net.minecraft.world.level.Level;
 import static com.skyforge.SkyforgeMod.LOGGER1;
 
 public class DebugHelicopterEntity extends AbstractAerialEntity {
+
     @Override
     public void tick() {
         super.tick();
@@ -41,9 +43,11 @@ public class DebugHelicopterEntity extends AbstractAerialEntity {
                 false
         );
 
+        this.combatBehavior = new HelicopterCombatBehavior(this);
+
         this.movement = new HelicopterMovement(this, config);
 
-        this.attack = new MachineGunAttack(this);
+        this.attackController = new HelicopterAttackController(this);
 
         this.targeting = new TargetingSystem(this);
 

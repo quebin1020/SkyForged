@@ -1,6 +1,7 @@
 package com.skyforge.entity;
 
 import com.skyforge.ai.AIStateMachine;
+import com.skyforge.ai.combat.CombatBehavior;
 import com.skyforge.attack.AttackController;
 import com.skyforge.movement.FlightMovementController;
 import com.skyforge.targeting.TargetingSystem;
@@ -13,9 +14,10 @@ import net.minecraft.world.level.Level;
 public abstract class AbstractAerialEntity extends Mob {
 
     protected FlightMovementController movement;
-    protected AttackController attack;
     protected AIStateMachine brain;
     protected TargetingSystem targeting;
+    protected CombatBehavior combatBehavior;
+    protected AttackController attackController;
 
     protected AbstractAerialEntity(EntityType<? extends Mob> type, Level level) {
         super(type, level);
@@ -35,19 +37,26 @@ public abstract class AbstractAerialEntity extends Mob {
             if (movement != null)
                 movement.tick();
 
-            if (attack != null)
-                attack.tick();
+            if (attackController != null)
+                attackController.tick();
 
             this.move(MoverType.SELF, this.getDeltaMovement());
         }
 
     }
+    public CombatBehavior getCombatBehavior() {
+
+        return combatBehavior;
+    }
 
     public FlightMovementController getMovementController() {
         return movement;
     }
-
     public TargetingSystem getTargetingSystem() {
         return targeting;
+    }
+    public AttackController getAttackController() {
+
+        return attackController;
     }
 }
