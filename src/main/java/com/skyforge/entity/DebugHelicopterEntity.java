@@ -2,6 +2,7 @@ package com.skyforge.entity;
 
 import com.skyforge.SkyforgeMod;
 import com.skyforge.ai.AIStateMachine;
+import com.skyforge.ai.PatrolNavigator;
 import com.skyforge.ai.combat.HelicopterCombatBehavior;
 import com.skyforge.attack.HelicopterAttackController;
 import com.skyforge.config.FlightConfig;
@@ -20,12 +21,21 @@ import static com.skyforge.SkyforgeMod.LOGGER1;
 
 public class DebugHelicopterEntity extends AbstractAerialEntity {
 
+
     @Override
     public void tick() {
+
         super.tick();
-        if (tickCount % 5 == 0){
-            if(brain.getPatrolTarget() != NULL){
-                DebugRender.drawLine(level(),this.position(),brain.getPatrolTarget());
+
+        if(tickCount % 5 == 0) {
+
+            if(brain.getPatrolTarget() != null) {
+
+                DebugRender.drawLine(
+                        level(),
+                        this.position(),
+                        brain.getPatrolTarget()
+                );
             }
         }
     }
@@ -51,7 +61,7 @@ public class DebugHelicopterEntity extends AbstractAerialEntity {
 
         this.targeting = new TargetingSystem(this);
 
-        this.brain = new AIStateMachine(this, PatrolPresets.helicopter());
+        this.brain = new AIStateMachine(this, new PatrolNavigator(this, PatrolPresets.helicopter()));
     }
 
     public static AttributeSupplier.Builder createAttributes() {

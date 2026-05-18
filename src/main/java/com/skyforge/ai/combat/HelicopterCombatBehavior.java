@@ -1,37 +1,101 @@
 package com.skyforge.ai.combat;
 
 import com.skyforge.entity.AbstractAerialEntity;
+
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
-public class HelicopterCombatBehavior implements CombatBehavior {
+public class HelicopterCombatBehavior
+        implements CombatBehavior {
+
     protected final AbstractAerialEntity entity;
 
-    protected double orbitRadius = 40;
+    /*
+        DISTANCIA ORBITAL
+     */
 
-    protected double orbitSpeed = 0.01;
+    protected double orbitRadius = 45;
 
-    protected double preferredHeight = 10;
+    /*
+        VELOCIDAD ORBITAL
+     */
+
+    protected double orbitSpeed = 0.008;
+
+    /*
+        ALTURA SOBRE OBJETIVO
+     */
+
+    protected double preferredHeight = 18;
+
+    /*
+        ÁNGULO ACTUAL
+     */
+
+    protected double orbitAngle;
+
+    /*
+        OFFSET INDIVIDUAL
+     */
+
+    protected final double orbitOffset;
+
     public HelicopterCombatBehavior(
             AbstractAerialEntity entity
     ) {
 
         this.entity = entity;
+
+        /*
+            OFFSET ÚNICO
+         */
+
+        this.orbitOffset =
+                entity.getRandom()
+                        .nextDouble()
+                        * Math.PI * 2;
+
+        /*
+            COMENZAR EN OFFSET
+         */
+
+        this.orbitAngle =
+                orbitOffset;
     }
+
     @Override
     public Vec3 getAttackPosition(
             LivingEntity target
     ) {
 
-        double angle = entity.tickCount * orbitSpeed;
+        /*
+            AVANZAR ÓRBITA
+         */
 
-        double offsetX = Math.cos(angle) * orbitRadius;
+        orbitAngle += orbitSpeed;
 
-        double offsetZ = Math.sin(angle) * orbitRadius;
+        /*
+            POSICIÓN ORBITAL
+         */
+
+        double offsetX =
+                Math.cos(orbitAngle)
+                        * orbitRadius;
+
+        double offsetZ =
+                Math.sin(orbitAngle)
+                        * orbitRadius;
+
+        /*
+            POSICIÓN FINAL
+         */
 
         return target.position().add(
+
                 offsetX,
+
                 preferredHeight,
+
                 offsetZ
         );
     }

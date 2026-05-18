@@ -1,18 +1,19 @@
 package com.skyforge.attack;
 
+import com.skyforge.ai.combat.CombatPlatform;
 import com.skyforge.entity.AbstractAerialEntity;
 import net.minecraft.world.entity.LivingEntity;
 
 public abstract class AttackController {
 
-    protected final AbstractAerialEntity entity;
-
+    protected final CombatPlatform platform;
     protected int cooldown;
 
     public AttackController(
-            AbstractAerialEntity entity
+            CombatPlatform platform
     ) {
-        this.entity = entity;
+
+        this.platform = platform;
     }
 
     public void tick() {
@@ -35,8 +36,7 @@ public abstract class AttackController {
 
     protected LivingEntity getTarget() {
 
-        return entity.getTargetingSystem()
-                .getTarget();
+        return platform.getCombatTarget();
     }
 
     protected abstract void attackTick();

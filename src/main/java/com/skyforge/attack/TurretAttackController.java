@@ -5,10 +5,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.SmallFireball;
 import net.minecraft.world.phys.Vec3;
 
-public class HelicopterAttackController
+public class TurretAttackController
         extends AttackController {
 
-    public HelicopterAttackController(
+    public TurretAttackController(
             CombatPlatform platform
     ) {
 
@@ -30,7 +30,7 @@ public class HelicopterAttackController
                                 target.position()
                         );
 
-        if(distance > 60)
+        if(distance > 80)
             return;
 
         if(!canAttack())
@@ -40,7 +40,7 @@ public class HelicopterAttackController
                 .canShoot())
             return;
 
-        resetCooldown(20);
+        resetCooldown(10);
 
         Vec3 direction =
                 platform.getAimController()
@@ -53,7 +53,7 @@ public class HelicopterAttackController
                         );
 
         direction =
-                direction.scale(2);
+                direction.scale(3);
 
         SmallFireball fireball =
                 new SmallFireball(

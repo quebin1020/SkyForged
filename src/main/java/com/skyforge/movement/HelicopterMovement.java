@@ -2,52 +2,326 @@ package com.skyforge.movement;
 
 import com.skyforge.config.FlightConfig;
 import com.skyforge.entity.AbstractAerialEntity;
+
+import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
-public class HelicopterMovement extends FlightMovementController {
+public class HelicopterMovement
+        extends FlightMovementController {
 
-    public HelicopterMovement(AbstractAerialEntity entity, FlightConfig config) {
+    /*
+        CONTROL VERTICAL
+     */
+
+    protected double verticalStrength = 0.04;
+
+    protected double maxVerticalSpeed = 0.25;
+
+    protected double verticalAcceleration = 0.08;
+
+    protected double verticalResponse = 0.04;
+
+    /*
+        HOVER
+     */
+
+    protected double hoverDrag = 0.92;
+
+    public HelicopterMovement(
+            AbstractAerialEntity entity,
+            FlightConfig config
+    ) {
+
         super(entity, config);
+    }
+    protected float rotateTowards(
+            float current,
+            float target,
+            float maxTurn
+    ) {
+
+        float delta =
+                Mth.wrapDegrees(
+                        target - current
+                );
+
+        delta =
+                Mth.clamp(
+                        delta,
+                        -maxTurn,
+                        maxTurn
+                );
+
+        return current + delta;
     }
 
     @Override
     protected void applyMovement() {
 
+
+        if(targetPosition == null)
+            return;
+
+        Vec3 currentPosition =
+                entity.position();
+
+        Vec3 currentVelocity =
+                entity.getDeltaMovement();
+
         Vec3 toTarget =
-                targetPosition.subtract(entity.position());
+                targetPosition.subtract(
+                        currentPosition
+                );
 
-        double distance = toTarget.length();
+        double distance =
+                toTarget.length();
 
-        if (distance < 2) {
+        /*
+            DEBUG
+         */
+
+        System.out.println(
+                "TARGET: " + targetPosition
+        );
+
+        System.out.println(
+                "POSITION: " + currentPosition
+        );
+
+        System.out.println(
+                "TO TARGET: " + toTarget
+        );
+
+        System.out.println(
+                "VELOCITY: " + currentVelocity
+        );
+
+        /*
+            LLEGÓ
+         */
+
+        if(distance < 2) {
 
             entity.setDeltaMovement(
-                    entity.getDeltaMovement().scale(0.8)
+
+                    currentVelocity.scale(
+                            hoverDrag
+                    )
             );
 
             return;
         }
 
-        Vec3 desiredDirection =
-                toTarget.normalize();
+        /*
+            DIRECCIÓN HORIZONTAL
+         */
+
+        Vec3 horizontalOffset =
+                new Vec3(
+
+                        toTarget.x,
+
+                        0,
+
+                        toTarget.z
+                );
+
+        double horizontalDistance =
+                horizontalOffset.length();
+
+        Vec3 horizontalDirection =
+                Vec3.ZERO;
+
+        if(horizontalDistance > 0.0001) {
+
+            horizontalDirection =
+                    horizontalOffset.normalize();
+        }
+
+        /*
+            VELOCIDAD OBJETIVO
+         */
 
         double speedFactor =
-                Math.min(distance / 20.0, 1.0);
+                Math.min(
+                        horizontalDistance / 20.0,
+                        1.0
+                );
 
         double targetSpeed =
-                config.maxSpeed * speedFactor;
+                config.maxSpeed
+                        * speedFactor;
 
-        Vec3 desiredVelocity =
-                desiredDirection.scale(targetSpeed);
+        Vec3 desiredHorizontalVelocity =
+                horizontalDirection.scale(
+                        targetSpeed
+                );
 
-        Vec3 currentVelocity =
-                entity.getDeltaMovement();
+        /*
+            VELOCIDAD HORIZONTAL ACTUAL
+         */
 
-        Vec3 steering =
-                desiredVelocity.subtract(currentVelocity)
-                        .scale(config.acceleration);
+        Vec3 currentHorizontalVelocity =
+                new Vec3(
+
+                        currentVelocity.x,
+
+                        0,
+
+                        currentVelocity.z
+                );
+
+        /*
+            STEERING HORIZONTAL
+         */
+
+        Vec3 horizontalSteering =
+                desiredHorizontalVelocity
+                        .subtract(
+                                currentHorizontalVelocity
+                        )
+                        .scale(
+                                config.acceleration
+                        );
+
+        /*
+            CONTROL VERTICAL SUAVIZADO
+         */
+
+        double verticalDifference =
+                toTarget.y;
+
+        double desiredVerticalVelocity =
+                Mth.clamp(
+
+                        verticalDifference
+                                * verticalStrength,
+
+                        -maxVerticalSpeed,
+
+                        maxVerticalSpeed
+                );
+
+        /*
+            SUAVIZAR RESPUESTA
+         */
+
+        double verticalDelta =
+                desiredVerticalVelocity
+                        - currentVelocity.y;
+
+        verticalDelta =
+                Mth.clamp(
+
+                        verticalDelta,
+
+                        -verticalResponse,
+
+                        verticalResponse
+                );
+
+        double verticalSteering =
+                verticalDelta
+                        * verticalAcceleration;
+
+        /*
+            VELOCIDAD FINAL
+         */
+
+        Vec3 finalVelocity =
+                new Vec3(
+
+                        currentVelocity.x
+                                + horizontalSteering.x,
+
+                        currentVelocity.y
+                                + verticalSteering,
+
+                        currentVelocity.z
+                                + horizontalSteering.z
+                );
+
+        /*
+            LIMITADOR HORIZONTAL
+         */
+
+        double horizontalSpeed =
+                Math.sqrt(
+
+                        finalVelocity.x * finalVelocity.x
+                                +
+                                finalVelocity.z * finalVelocity.z
+                );
+
+        if(horizontalSpeed > config.maxSpeed) {
+
+            double scale =
+                    config.maxSpeed
+                            / horizontalSpeed;
+
+            finalVelocity =
+                    new Vec3(
+
+                            finalVelocity.x * scale,
+
+                            finalVelocity.y,
+
+                            finalVelocity.z * scale
+                    );
+        }
+
+        /*
+            LIMITADOR VERTICAL
+         */
+
+        double clampedVertical =
+                Mth.clamp(
+
+                        finalVelocity.y,
+
+                        -maxVerticalSpeed,
+
+                        maxVerticalSpeed
+                );
+
+        finalVelocity =
+                new Vec3(
+
+                        finalVelocity.x,
+
+                        clampedVertical,
+
+                        finalVelocity.z
+                );
+
+        if(horizontalDistance > 0.001) {
+
+            float targetYaw =
+                    (float)(
+                            Math.atan2(
+                                    finalVelocity.z,
+                                    finalVelocity.x
+                            ) * (180F / Math.PI)
+                    ) - 90f;
+
+            entity.setYRot(
+                    rotateTowards(
+
+                            entity.getYRot(),
+
+                            targetYaw,
+
+                            4f
+                    )
+            );
+        }
+
+        /*
+            APLICAR
+         */
 
         entity.setDeltaMovement(
-                currentVelocity.add(steering)
+                finalVelocity
         );
     }
 }
