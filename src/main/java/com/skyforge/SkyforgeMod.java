@@ -17,7 +17,6 @@ public class SkyforgeMod {
     public static final String MOD_ID = "skyforge";
 
     public SkyforgeMod(IEventBus bus) {
-
         ModEntities.register(bus);
         ModItems.register(bus);
 

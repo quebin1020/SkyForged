@@ -2,17 +2,12 @@ package com.skyforge.ai;
 
 import com.skyforge.config.PatrolConfig;
 import com.skyforge.entity.AbstractAerialEntity;
-import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
 
 import static com.skyforge.SkyforgeMod.LOGGER1;
 
 public class AIStateMachine {
-
 
     protected Vec3 patrolTarget;
 
@@ -22,9 +17,7 @@ public class AIStateMachine {
 
     protected final PatrolConfig patrolConfig;
 
-    protected PatrolNavigator patrolNavigator;
-
-    protected LivingEntity target;
+    protected final PatrolNavigator patrolNavigator;
 
     protected int stateTicks;
 
@@ -34,13 +27,24 @@ public class AIStateMachine {
             AbstractAerialEntity entity,
             PatrolConfig patrolConfig
     ) {
-        this.entity = entity;
-        this.patrolConfig = patrolConfig;
-        this.patrolNavigator = new PatrolNavigator(entity,patrolConfig);
-    }
-    public void tick() {
 
-        if(entity.level().isClientSide()) return;
+        this.entity = entity;
+
+        this.patrolConfig = patrolConfig;
+
+        this.patrolNavigator =
+                new PatrolNavigator(
+                        entity,
+                        patrolConfig
+                );
+    }
+
+    public void tick() {
+        System.out.println(
+                "STATE: " + currentState
+        );
+        if(entity.level().isClientSide())
+            return;
 
         updateStateTransitions();
 
@@ -58,12 +62,13 @@ public class AIStateMachine {
 
             case EVADE -> evadeTick();
         }
-
     }
 
-
-
     protected void updateStateTransitions() {
+
+        LivingEntity target =
+                entity.getTargetingSystem()
+                        .getTarget();
 
         if(target == null) {
 
@@ -73,18 +78,16 @@ public class AIStateMachine {
         }
 
         double distance =
-                entity.position().distanceTo(
-                        target.position()
-                );
+                entity.position()
+                        .distanceTo(
+                                target.position()
+                        );
 
         switch(currentState) {
 
             case PATROL -> {
 
-                if(target != null) {
-
-                    setState(AIState.CHASE);
-                }
+                setState(AIState.CHASE);
             }
 
             case CHASE -> {
@@ -118,9 +121,13 @@ public class AIStateMachine {
             }
         }
     }
-    public void setState(AIState state) {
 
-        if(this.currentState == state) return;
+    public void setState(
+            AIState state
+    ) {
+
+        if(this.currentState == state)
+            return;
 
         this.currentState = state;
 
@@ -128,10 +135,8 @@ public class AIStateMachine {
     }
 
     public AIState getState() {
-        return currentState;
-    }
 
-    private void attackTick() {
+        return currentState;
     }
 
     protected void idleTick() {
@@ -139,31 +144,115 @@ public class AIStateMachine {
 
     protected void patrolTick() {
 
-        if (patrolTarget == null || entity.position().distanceTo(patrolTarget) < 5) {
+        if(
+                patrolTarget == null ||
 
-            patrolTarget = patrolNavigator.generatePatrolPoint();
-            LOGGER1.info("setting new targetpoint");
-            LOGGER1.info(patrolTarget.x + " " + patrolTarget.y + " " +patrolTarget.z);
+                        entity.position()
+                                .distanceTo(
+                                        patrolTarget
+                                ) < 5
+        ) {
+
+            patrolTarget =
+                    patrolNavigator
+                            .generatePatrolPoint();
+
+            LOGGER1.info(
+                    "setting new patrol point"
+            );
+
+            LOGGER1.info(
+                    patrolTarget.x
+                            + " "
+                            + patrolTarget.y
+                            + " "
+                            + patrolTarget.z
+            );
         }
 
-        entity.getMovementController().setTargetPosition(patrolTarget);
-
+        entity.getMovementController()
+                .setTargetPosition(
+                        patrolTarget
+                );
     }
 
     protected void chaseTick() {
+
+        LivingEntity target =
+                entity.getTargetingSystem()
+                        .getTarget();
+
+        if(target == null)
+            return;
+
+        Vec3 chasePosition =
+                entity.getCombatBehavior()
+                        .getAttackPosition(
+                                target
+                        );
+
+        entity.getMovementController()
+                .setTargetPosition(
+                        chasePosition
+                );
     }
 
-    protected void attackRunTick() {
+    protected void attackTick() {
+
+        LivingEntity target =
+                entity.getTargetingSystem()
+                        .getTarget();
+
+        if(target == null)
+            return;
+
+        Vec3 attackPosition =
+                entity.getCombatBehavior()
+                        .getAttackPosition(
+                                target
+                        );
+
+        entity.getMovementController()
+                .setTargetPosition(
+                        attackPosition
+                );
     }
 
     protected void evadeTick() {
+
+        LivingEntity target =
+                entity.getTargetingSystem()
+                        .getTarget();
+
+        if(target == null)
+            return;
+
+        Vec3 evadeDirection =
+                entity.position()
+                        .subtract(
+                                target.position()
+                        )
+                        .normalize();
+
+        Vec3 evadePosition =
+                entity.position()
+                        .add(
+                                evadeDirection.scale(40)
+                        )
+                        .add(
+                                0,
+                                15,
+                                0
+                        );
+
+        entity.getMovementController()
+                .setTargetPosition(
+                        evadePosition
+                );
     }
 
+    public Vec3 getPatrolTarget() {
 
-
-
-    public Vec3 getPatrolTarget(){ return patrolTarget;}
-
-
-
+        return patrolTarget;
+    }
 }
