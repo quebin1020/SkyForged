@@ -2,17 +2,30 @@ package com.skyforge.movement;
 
 import com.skyforge.config.FlightConfig;
 import com.skyforge.entity.AbstractAerialEntity;
+
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
 public class HelicopterMovement
         extends FlightMovementController {
 
-    protected double verticalStrength = 0.15;
+    /*
+        CONTROL VERTICAL
+     */
 
-    protected double maxVerticalSpeed = 0.8;
+    protected double verticalStrength = 0.04;
 
-    protected double verticalAcceleration = 0.2;
+    protected double maxVerticalSpeed = 0.25;
+
+    protected double verticalAcceleration = 0.08;
+
+    protected double verticalResponse = 0.04;
+
+    /*
+        HOVER
+     */
+
+    protected double hoverDrag = 0.92;
 
     public HelicopterMovement(
             AbstractAerialEntity entity,
@@ -21,16 +34,43 @@ public class HelicopterMovement
 
         super(entity, config);
     }
+    protected float rotateTowards(
+            float current,
+            float target,
+            float maxTurn
+    ) {
+
+        float delta =
+                Mth.wrapDegrees(
+                        target - current
+                );
+
+        delta =
+                Mth.clamp(
+                        delta,
+                        -maxTurn,
+                        maxTurn
+                );
+
+        return current + delta;
+    }
 
     @Override
     protected void applyMovement() {
 
+
         if(targetPosition == null)
             return;
 
+        Vec3 currentPosition =
+                entity.position();
+
+        Vec3 currentVelocity =
+                entity.getDeltaMovement();
+
         Vec3 toTarget =
                 targetPosition.subtract(
-                        entity.position()
+                        currentPosition
                 );
 
         double distance =
@@ -39,62 +79,68 @@ public class HelicopterMovement
         /*
             DEBUG
          */
-
+        /*
         System.out.println(
-                "TARGET Y: " + targetPosition.y
+                "TARGET: " + targetPosition
         );
 
         System.out.println(
-                "ENTITY Y: " + entity.position().y
+                "POSITION: " + currentPosition
         );
 
         System.out.println(
-                "DIFF Y: " + toTarget.y
+                "TO TARGET: " + toTarget
         );
 
         System.out.println(
-                "CURRENT VELOCITY: "
-                        + entity.getDeltaMovement()
-        );
+                "VELOCITY: " + currentVelocity
+        );*/
 
         /*
-            SI LLEGÓ
+            LLEGÓ
          */
 
         if(distance < 2) {
 
             entity.setDeltaMovement(
 
-                    entity.getDeltaMovement()
-                            .scale(0.8)
+                    currentVelocity.scale(
+                            hoverDrag
+                    )
             );
 
             return;
         }
 
         /*
-            MOVIMIENTO HORIZONTAL
+            DIRECCIÓN HORIZONTAL
          */
 
-        Vec3 horizontalDirection =
+        Vec3 horizontalOffset =
                 new Vec3(
+
                         toTarget.x,
+
                         0,
+
                         toTarget.z
                 );
 
-        if(horizontalDirection.lengthSqr() > 0.0001) {
+        double horizontalDistance =
+                horizontalOffset.length();
+
+        Vec3 horizontalDirection =
+                Vec3.ZERO;
+
+        if(horizontalDistance > 0.0001) {
 
             horizontalDirection =
-                    horizontalDirection.normalize();
+                    horizontalOffset.normalize();
         }
 
-        double horizontalDistance =
-                Math.sqrt(
-                        toTarget.x * toTarget.x
-                                +
-                                toTarget.z * toTarget.z
-                );
+        /*
+            VELOCIDAD OBJETIVO
+         */
 
         double speedFactor =
                 Math.min(
@@ -112,22 +158,22 @@ public class HelicopterMovement
                 );
 
         /*
-            VELOCIDAD ACTUAL
-         */
-
-        Vec3 currentVelocity =
-                entity.getDeltaMovement();
-
-        /*
-            STEERING HORIZONTAL
+            VELOCIDAD HORIZONTAL ACTUAL
          */
 
         Vec3 currentHorizontalVelocity =
                 new Vec3(
+
                         currentVelocity.x,
+
                         0,
+
                         currentVelocity.z
                 );
+
+        /*
+            STEERING HORIZONTAL
+         */
 
         Vec3 horizontalSteering =
                 desiredHorizontalVelocity
@@ -139,28 +185,45 @@ public class HelicopterMovement
                         );
 
         /*
-            CONTROL VERTICAL
+            CONTROL VERTICAL SUAVIZADO
          */
 
         double verticalDifference =
-                toTarget.y;
+                targetPosition.y - currentPosition.y;
+
+        double targetY = targetPosition.y;
+        double currentY = currentPosition.y;
+
+        double verticalError = targetY - currentY;
 
         double desiredVerticalVelocity =
-                Mth.clamp(
-
-                        verticalDifference
-                                * verticalStrength,
-
+                Mth.clamp(verticalError * verticalStrength,
                         -maxVerticalSpeed,
-
-                        maxVerticalSpeed
-                );
+                        maxVerticalSpeed);
 
         double verticalSteering =
-                (
-                        desiredVerticalVelocity
-                                - currentVelocity.y
-                ) * verticalAcceleration;
+                (desiredVerticalVelocity - currentVelocity.y)
+                        * verticalAcceleration;
+
+        /*
+            SUAVIZAR RESPUESTA
+         */
+
+        double verticalDelta =
+                desiredVerticalVelocity
+                        - currentVelocity.y;
+
+        verticalDelta =
+                Mth.clamp(
+
+                        verticalDelta,
+
+                        -verticalResponse,
+
+                        verticalResponse
+                );
+
+
 
         /*
             VELOCIDAD FINAL
@@ -180,11 +243,12 @@ public class HelicopterMovement
                 );
 
         /*
-            LIMITAR VELOCIDAD
+            LIMITADOR HORIZONTAL
          */
 
         double horizontalSpeed =
                 Math.sqrt(
+
                         finalVelocity.x * finalVelocity.x
                                 +
                                 finalVelocity.z * finalVelocity.z
@@ -205,6 +269,52 @@ public class HelicopterMovement
 
                             finalVelocity.z * scale
                     );
+        }
+
+        /*
+            LIMITADOR VERTICAL
+         */
+
+        double clampedVertical =
+                Mth.clamp(
+
+                        finalVelocity.y,
+
+                        -maxVerticalSpeed,
+
+                        maxVerticalSpeed
+                );
+
+        finalVelocity =
+                new Vec3(
+
+                        finalVelocity.x,
+
+                        clampedVertical,
+
+                        finalVelocity.z
+                );
+
+        if(horizontalDistance > 0.001) {
+
+            float targetYaw =
+                    (float)(
+                            Math.atan2(
+                                    finalVelocity.z,
+                                    finalVelocity.x
+                            ) * (180F / Math.PI)
+                    ) - 90f;
+
+            entity.setYRot(
+                    rotateTowards(
+
+                            entity.getYRot(),
+
+                            targetYaw,
+
+                            4f
+                    )
+            );
         }
 
         /*

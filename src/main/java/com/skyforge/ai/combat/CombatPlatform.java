@@ -8,21 +8,54 @@ import net.minecraft.world.phys.Vec3;
 
 public interface CombatPlatform {
 
+    /*
+        POSICIÓN / MOVIMIENTO
+     */
+
     Vec3 getCombatPosition();
 
     Vec3 getCombatVelocity();
 
-    Vec3 getAimOrigin();
+    /*
+        AIM
+     */
+
+    Vec3 getTurretOrigin(int id);
+
+
+    /*
+        TARGET
+     */
+
+    LivingEntity getCombatTarget();
+
+    /*
+        WORLD
+     */
 
     Level getCombatLevel();
 
     RandomSource getCombatRandom();
 
-    LivingEntity getCombatTarget();
+    /*
+        ENTITY OWNER
+     */
 
     Entity getCombatOwner();
 
-    void spawnCombatEntity(Entity entity);
+    /*
+        SPAWN
+     */
 
-    AimController getAimController();
+    void spawnCombatEntity(
+            Entity entity
+    );
+
+    /*
+        CONTROLLERS
+     */
+
+    AimController getAimController(int id);
+
+    int getTurretCount();
 }

@@ -1,20 +1,19 @@
 package com.skyforge.attack;
 
+import com.skyforge.ai.combat.AimController;
 import com.skyforge.ai.combat.CombatPlatform;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.SmallFireball;
 import net.minecraft.world.phys.Vec3;
-import com.skyforge.ai.combat.AimController;
 
-public class TurretAttackController
-        extends AttackController {
+public class AirshipAttackController extends AttackController {
 
-    public TurretAttackController(
-            CombatPlatform platform
-    ) {
+    private int salvoCounter = 0;
 
+    public AirshipAttackController(CombatPlatform platform) {
         super(platform);
     }
+
     @Override
     protected void attackTick() {
 
@@ -23,31 +22,22 @@ public class TurretAttackController
         if (target == null)
             return;
 
-        double distance = platform.getCombatPosition()
-                .distanceTo(target.position());
-
-        if (distance > 80)
+        if (!canAttack())
             return;
 
-        for (int id = 0; id < 2; id++) { // o turrets.size()
+        if (salvoCounter > 0) {
+            salvoCounter--;
+            return;
+        }
+
+        for (int id = 0; id < platform.getTurretCount(); id++) {
 
             AimController turret = platform.getAimController(id);
 
-            if (turret == null)
+            if (turret == null || !turret.canShoot())
                 continue;
 
-            if (!canAttack())
-                continue;
-
-            if (!turret.canShoot())
-                continue;
-
-            resetCooldown(10);
-
-            Vec3 direction = turret.getAimDirection();
-            direction = turret.applyInaccuracy(direction);
-            direction = direction.scale(3);
-
+            Vec3 dir = turret.applyInaccuracy(turret.getAimDirection());
             Vec3 origin = platform.getTurretOrigin(id);
 
             SmallFireball fireball = new SmallFireball(
@@ -55,14 +45,14 @@ public class TurretAttackController
                     origin.x,
                     origin.y,
                     origin.z,
-                    direction
+                    dir.scale(2)
             );
 
             fireball.setOwner(platform.getCombatOwner());
-
             platform.spawnCombatEntity(fireball);
-
-            break; // evita que todos disparen en el mismo tick
         }
+
+        resetCooldown(40);
+        salvoCounter = 10; // delay entre salvas
     }
 }

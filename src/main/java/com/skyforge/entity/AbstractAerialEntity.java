@@ -2,6 +2,7 @@ package com.skyforge.entity;
 
 import com.skyforge.ai.AIStateMachine;
 import com.skyforge.ai.combat.AimController;
+import com.skyforge.ai.combat.AimProfile;
 import com.skyforge.ai.combat.CombatBehavior;
 import com.skyforge.ai.combat.CombatPlatform;
 import com.skyforge.attack.AttackController;
@@ -13,24 +14,58 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
-public abstract class AbstractAerialEntity extends Mob implements CombatPlatform {
+import java.util.HashMap;
+import java.util.Map;
 
+public abstract class AbstractAerialEntity extends Mob implements CombatPlatform {
+    float bodyYaw, prevBodyYaw;
+    float turretYaw, prevTurretYaw;
+    float turretPitch, prevTurretPitch;
+
+    protected final Map<Integer, AimController> turrets = new HashMap<>();
     protected FlightMovementController movement;
     protected AIStateMachine brain;
     protected TargetingSystem targeting;
     protected CombatBehavior combatBehavior;
     protected AttackController attackController;
-    protected AimController aimController;
 
     protected AbstractAerialEntity(EntityType<? extends Mob> type, Level level) {
         super(type, level);
         this.setNoGravity(true);
-        this.aimController = new AimController(this);
+        initTurrets();
+    }
+    protected void initTurrets() {
+
+        turrets.put(0, new AimController(this, 0, AimProfile.HELICOPTER));
+        turrets.put(1, new AimController(this, 1, AimProfile.HELICOPTER));
+
     }
     @Override
-    public AimController getAimController() {
+    public AimController getAimController(int id) {
+        return turrets.get(id);
+    }
+    @Override
+    public int getTurretCount() {
+        return turrets.size();
+    }
+    @Override
+    public boolean removeWhenFarAway(
+            double distance
+    ) {
+        return false;
+    }
+    @Override
+    public boolean requiresCustomPersistence() {
+        return true;
+    }
 
-        return aimController;
+    public Vec3 getAimDirection(int turretId) {
+        AimController turret = turrets.get(turretId);
+
+        if (turret == null)
+            return new Vec3(0, 0, 1);
+
+        return turret.getAimDirection();
     }
 
     @Override
@@ -66,13 +101,13 @@ public abstract class AbstractAerialEntity extends Mob implements CombatPlatform
     }
 
     @Override
-    public Vec3 getAimOrigin() {
+    public Vec3 getTurretOrigin(int id) {
 
-        return this.position().add(
-                0,
-                2,
-                0
-        );
+        return switch (id) {
+            case 0 -> position().add(0, 1.5, 0.5);
+            case 1 -> position().add(0, 1.5, -0.5);
+            default -> position();
+        };
     }
 
     @Override
@@ -92,28 +127,31 @@ public abstract class AbstractAerialEntity extends Mob implements CombatPlatform
 
         super.tick();
 
-        if(level().isClientSide())
+        if (level().isClientSide())
             return;
-
-        if(targeting != null)
+        this.setNoGravity(true);
+        if (targeting != null)
             targeting.tick();
 
-        if(brain != null)
+        if (brain != null)
             brain.tick();
 
-        if(aimController != null)
-            aimController.tick();
+        LivingEntity target = getCombatTarget();
 
-        if(attackController != null)
+        if (target != null) {
+
+            for (AimController turret : turrets.values()) {
+                turret.tick(target);
+            }
+        }
+
+        if (attackController != null)
             attackController.tick();
 
-        if(movement != null)
+        if (movement != null)
             movement.tick();
 
-        this.move(
-                MoverType.SELF,
-                this.getDeltaMovement()
-        );
+        this.move(MoverType.SELF, this.getDeltaMovement());
     }
     public CombatBehavior getCombatBehavior() {
 
