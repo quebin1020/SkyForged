@@ -63,6 +63,10 @@ public class AIStateMachine {
         LivingEntity target =
                 entity.getCombatTarget();
 
+        LivingEntity target =
+                entity.getTargetingSystem()
+                        .getTarget();
+
         if(target == null) {
 
             setState(AIState.PATROL);
@@ -172,7 +176,19 @@ public class AIStateMachine {
                 );
     }
 
-    protected void evadeTick() {
+        if(target == null)
+            return;
+
+        Vec3 chasePosition =
+                entity.getCombatBehavior()
+                        .getAttackPosition(
+                                target
+                        );
+
+        entity.getMovementController()
+                .setTargetPosition(
+                        chasePosition
+                );
     }
 
     /*
