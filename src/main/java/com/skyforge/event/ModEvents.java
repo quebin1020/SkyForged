@@ -1,8 +1,6 @@
 package com.skyforge.event;
 
-import com.skyforge.entity.DebugHelicopterEntity;
-import com.skyforge.entity.ModEntities;
-import com.skyforge.entity.BasicTurretEntity;
+import com.skyforge.entity.*;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
@@ -17,6 +15,21 @@ public class ModEvents {
                 ModEntities.DEBUG_HELICOPTER.get(),
 
                 DebugHelicopterEntity
+                        .createAttributes()
+                        .build()
+        );
+
+        event.put(
+                ModEntities.BASIC_AIRSHIP.get(),
+
+                AirshipEntity
+                        .createAttributes()
+                        .build()
+        );
+        event.put(
+                ModEntities.BASIC_PLANE.get(),
+
+                PlaneEntity
                         .createAttributes()
                         .build()
         );

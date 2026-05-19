@@ -1,16 +1,16 @@
 package com.skyforge.entity;
 
-import com.skyforge.SkyforgeMod;
 import com.skyforge.ai.AIStateMachine;
 import com.skyforge.ai.PatrolNavigator;
 import com.skyforge.ai.combat.AimController;
-import com.skyforge.ai.combat.HelicopterCombatBehavior;
-import com.skyforge.attack.HelicopterAttackController;
+import com.skyforge.ai.combat.AirshipCombatBehavior;
+import com.skyforge.attack.AirshipAttackController;
+import com.skyforge.attack.TurretAttackController;
 import com.skyforge.config.FlightConfig;
 import com.skyforge.config.PatrolPresets;
+import com.skyforge.movement.AirshipMovement;
 import com.skyforge.movement.HelicopterMovement;
 import com.skyforge.targeting.TargetingSystem;
-
 import com.skyforge.util.DebugRender;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -18,18 +18,14 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 
-import static com.skyforge.SkyforgeMod.LOGGER1;
-
-public class DebugHelicopterEntity extends AbstractAerialEntity {
-
+public class AirshipEntity extends AbstractAerialEntity {
 
     @Override
     public void tick() {
+
         super.tick();
-        System.out.println("GRAVITY: " + this.isNoGravity());
-        System.out.println("NO GRAVITY: " + this.isNoGravity());
         if (level().isClientSide()) return;
-        if (brain != null && tickCount % 5 == 0) {
+        if (brain != null && tickCount % 10 == 0) {
 
             if (brain.getPatrolTarget() != null) {
 
@@ -42,21 +38,22 @@ public class DebugHelicopterEntity extends AbstractAerialEntity {
         }
     }
 
-    public DebugHelicopterEntity(EntityType<? extends Mob> type, Level level) {
+    public AirshipEntity(EntityType<? extends Mob> type, Level level) {
+
         super(type, level);
-        setNoGravity(true);
+        this.setNoGravity(true);
         initTurrets();
         for (AimController turret : turrets.values()) {
-            turret.setMode(AimController.AimMode.FREE_TRACKING);
+            turret.setMode(AimController.AimMode.LIMITED_TURN);
         }
 
         FlightConfig config = new FlightConfig(
-                0.35f,
-                0.03f,
-                4f,
-                0.02f,
-                0.98f,
-                true,
+                0.12f,   // velocidad baja
+                0.01f,   // poca aceleración
+                10f,     // inercia alta
+                0.01f,   // corrección mínima
+                0.995f,  // muy estable
+                false,
                 false
         );
 
@@ -64,22 +61,22 @@ public class DebugHelicopterEntity extends AbstractAerialEntity {
 
         this.brain = new AIStateMachine(
                 this,
-                new PatrolNavigator(this, PatrolPresets.helicopter())
+                new PatrolNavigator(this, PatrolPresets.boat())
         );
 
-        this.combatBehavior = new HelicopterCombatBehavior(this);
+        this.combatBehavior = new AirshipCombatBehavior(this);
 
-        this.movement = new HelicopterMovement(this, config);
+        this.movement = new AirshipMovement(this, config);
 
-        this.attackController = new HelicopterAttackController(this);
+        this.attackController = new AirshipAttackController(this);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
 
         return Mob.createMobAttributes()
-                .add(Attributes.MAX_HEALTH, 20.0)
-                .add(Attributes.FLYING_SPEED, 0.3)
-                .add(Attributes.MOVEMENT_SPEED, 0.25)
-                .add(Attributes.FOLLOW_RANGE, 64.0);
+                .add(Attributes.MAX_HEALTH, 60.0)
+                .add(Attributes.FLYING_SPEED, 0.15)
+                .add(Attributes.MOVEMENT_SPEED, 0.10)
+                .add(Attributes.FOLLOW_RANGE, 96.0);
     }
 }

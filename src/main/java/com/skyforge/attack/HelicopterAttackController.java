@@ -1,5 +1,6 @@
 package com.skyforge.attack;
 
+import com.skyforge.ai.combat.AimController;
 import com.skyforge.ai.combat.CombatPlatform;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.SmallFireball;
@@ -18,63 +19,51 @@ public class HelicopterAttackController
     @Override
     protected void attackTick() {
 
-        LivingEntity target =
-                getTarget();
+        LivingEntity target = getTarget();
 
-        if(target == null)
+        if (target == null)
             return;
 
-        double distance =
-                platform.getCombatPosition()
-                        .distanceTo(
-                                target.position()
-                        );
+        double distance = platform.getCombatPosition()
+                .distanceTo(target.position());
 
-        if(distance > 60)
+        if (distance > 60)
             return;
 
-        if(!canAttack())
-            return;
+        for (int id = 0; id < 2; id++) { // o turrets.size()
 
-        if(!platform.getAimController()
-                .canShoot())
-            return;
+            AimController turret = platform.getAimController(id);
 
-        resetCooldown(20);
+            if (turret == null)
+                continue;
 
-        Vec3 direction =
-                platform.getAimController()
-                        .getAimDirection();
+            if (!turret.canShoot())
+                continue;
 
-        direction =
-                platform.getAimController()
-                        .applyInaccuracy(
-                                direction
-                        );
+            Vec3 direction = turret.getAimDirection();
+            direction = turret.applyInaccuracy(direction);
 
-        direction =
-                direction.scale(2);
+            if (cooldown > 0)
+                continue;
 
-        SmallFireball fireball =
-                new SmallFireball(
+            resetCooldown(20);
 
-                        platform.getCombatLevel(),
+            Vec3 origin = platform.getTurretOrigin(id);
 
-                        platform.getAimOrigin().x,
+            SmallFireball fireball = new SmallFireball(
+                    platform.getCombatLevel(),
+                    origin.x,
+                    origin.y,
+                    origin.z,
+                    direction.scale(2)
+            );
 
-                        platform.getAimOrigin().y,
+            fireball.setOwner(platform.getCombatOwner());
 
-                        platform.getAimOrigin().z,
+            platform.spawnCombatEntity(fireball);
 
-                        direction
-                );
-
-        fireball.setOwner(
-                platform.getCombatOwner()
-        );
-
-        platform.spawnCombatEntity(
-                fireball
-        );
+            break; // opcional: evita que todos disparen al mismo tick
+        }
     }
+
 }

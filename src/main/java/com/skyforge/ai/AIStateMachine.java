@@ -1,52 +1,38 @@
 package com.skyforge.ai;
 
+import com.skyforge.ai.combat.CombatBehavior;
 import com.skyforge.config.PatrolConfig;
 import com.skyforge.entity.AbstractAerialEntity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
-import static com.skyforge.SkyforgeMod.LOGGER1;
-
 public class AIStateMachine {
-
-    protected Vec3 patrolTarget;
 
     protected final AbstractAerialEntity entity;
 
-    protected AIState currentState = AIState.PATROL;
+    protected AIState currentState =
+            AIState.PATROL;
 
-    protected final PatrolConfig patrolConfig;
+    protected Vec3 patrolTarget;
 
-    protected final PatrolNavigator patrolNavigator;
+    protected PatrolNavigator patrolNavigator;
 
     protected int stateTicks;
 
-    protected int lastSeenTargetTicks;
-
     public AIStateMachine(
             AbstractAerialEntity entity,
-            PatrolConfig patrolConfig
+            PatrolNavigator patrolNavigator
     ) {
 
         this.entity = entity;
 
-        this.patrolConfig = patrolConfig;
-
         this.patrolNavigator =
-                new PatrolNavigator(
-                        entity,
-                        patrolConfig
-                );
+                patrolNavigator;
     }
 
     public void tick() {
-        System.out.println(
-                "STATE: " + currentState
-        );
-        if(entity.level().isClientSide())
-            return;
 
-        updateStateTransitions();
+        updateTransitions();
 
         stateTicks++;
 
@@ -63,8 +49,19 @@ public class AIStateMachine {
             case EVADE -> evadeTick();
         }
     }
+    public Vec3 getPatrolTarget() {
 
-    protected void updateStateTransitions() {
+        return patrolTarget;
+    }
+
+    /*
+        TRANSITIONS
+     */
+
+    protected void updateTransitions() {
+
+        LivingEntity target =
+                entity.getCombatTarget();
 
         LivingEntity target =
                 entity.getTargetingSystem()
@@ -78,7 +75,7 @@ public class AIStateMachine {
         }
 
         double distance =
-                entity.position()
+                entity.getCombatPosition()
                         .distanceTo(
                                 target.position()
                         );
@@ -87,57 +84,36 @@ public class AIStateMachine {
 
             case PATROL -> {
 
-                setState(AIState.CHASE);
+                setState(
+                        AIState.CHASE
+                );
             }
 
             case CHASE -> {
 
-                if(distance < 30) {
+                if(distance < 60) {
 
-                    setState(AIState.ATTACK);
+                    setState(
+                            AIState.ATTACK
+                    );
                 }
             }
 
             case ATTACK -> {
 
-                if(distance > 50) {
+                if(distance > 90) {
 
-                    setState(AIState.CHASE);
-                }
-
-                if(entity.getHealth()
-                        < entity.getMaxHealth() * 0.3f) {
-
-                    setState(AIState.EVADE);
-                }
-            }
-
-            case EVADE -> {
-
-                if(stateTicks > 100) {
-
-                    setState(AIState.PATROL);
+                    setState(
+                            AIState.CHASE
+                    );
                 }
             }
         }
     }
 
-    public void setState(
-            AIState state
-    ) {
-
-        if(this.currentState == state)
-            return;
-
-        this.currentState = state;
-
-        this.stateTicks = 0;
-    }
-
-    public AIState getState() {
-
-        return currentState;
-    }
+    /*
+        STATES
+     */
 
     protected void idleTick() {
     }
@@ -145,9 +121,9 @@ public class AIStateMachine {
     protected void patrolTick() {
 
         if(
-                patrolTarget == null ||
-
-                        entity.position()
+                patrolTarget == null
+                        ||
+                        entity.getCombatPosition()
                                 .distanceTo(
                                         patrolTarget
                                 ) < 5
@@ -156,18 +132,6 @@ public class AIStateMachine {
             patrolTarget =
                     patrolNavigator
                             .generatePatrolPoint();
-
-            LOGGER1.info(
-                    "setting new patrol point"
-            );
-
-            LOGGER1.info(
-                    patrolTarget.x
-                            + " "
-                            + patrolTarget.y
-                            + " "
-                            + patrolTarget.z
-            );
         }
 
         entity.getMovementController()
@@ -179,8 +143,38 @@ public class AIStateMachine {
     protected void chaseTick() {
 
         LivingEntity target =
-                entity.getTargetingSystem()
-                        .getTarget();
+                entity.getCombatTarget();
+
+        if(target == null)
+            return;
+
+        entity.getMovementController()
+                .setTargetPosition(
+                        target.position()
+                );
+    }
+
+    protected void attackTick() {
+
+        LivingEntity target =
+                entity.getCombatTarget();
+
+        if(target == null)
+            return;
+
+        CombatBehavior behavior =
+                entity.getCombatBehavior();
+
+        Vec3 attackPosition =
+                behavior.getAttackPosition(
+                        target
+                );
+
+        entity.getMovementController()
+                .setTargetPosition(
+                        attackPosition
+                );
+    }
 
         if(target == null)
             return;
@@ -197,62 +191,24 @@ public class AIStateMachine {
                 );
     }
 
-    protected void attackTick() {
+    /*
+        HELPERS
+     */
 
-        LivingEntity target =
-                entity.getTargetingSystem()
-                        .getTarget();
+    protected void setState(
+            AIState state
+    ) {
 
-        if(target == null)
+        if(currentState == state)
             return;
 
-        Vec3 attackPosition =
-                entity.getCombatBehavior()
-                        .getAttackPosition(
-                                target
-                        );
+        currentState = state;
 
-        entity.getMovementController()
-                .setTargetPosition(
-                        attackPosition
-                );
+        stateTicks = 0;
     }
 
-    protected void evadeTick() {
+    public AIState getState() {
 
-        LivingEntity target =
-                entity.getTargetingSystem()
-                        .getTarget();
-
-        if(target == null)
-            return;
-
-        Vec3 evadeDirection =
-                entity.position()
-                        .subtract(
-                                target.position()
-                        )
-                        .normalize();
-
-        Vec3 evadePosition =
-                entity.position()
-                        .add(
-                                evadeDirection.scale(40)
-                        )
-                        .add(
-                                0,
-                                15,
-                                0
-                        );
-
-        entity.getMovementController()
-                .setTargetPosition(
-                        evadePosition
-                );
-    }
-
-    public Vec3 getPatrolTarget() {
-
-        return patrolTarget;
+        return currentState;
     }
 }

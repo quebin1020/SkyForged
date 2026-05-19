@@ -66,4 +66,44 @@ public class ModEntities {
                                     "basic_turret"
                             )
             );
+    public static final DeferredHolder<
+            EntityType<?>,
+            EntityType<PlaneEntity>
+            > BASIC_PLANE =
+            ENTITIES.register(
+                    "basic_plane",
+
+                    () -> EntityType.Builder
+                            .of(
+                                    PlaneEntity::new,
+                                    MobCategory.MONSTER
+                            )
+                            .sized(
+                                    1.0f,
+                                    1.5f
+                            )
+                            .build(
+                                    "basic_plane"
+                            )
+            );
+    public static final DeferredHolder<
+            EntityType<?>,
+            EntityType<AirshipEntity>
+            > BASIC_AIRSHIP =
+            ENTITIES.register(
+                    "basic_airship",
+
+                    () -> EntityType.Builder
+                            .of(
+                                    AirshipEntity::new,
+                                    MobCategory.MONSTER
+                            )
+                            .sized(
+                                    1.0f,
+                                    1.5f
+                            )
+                            .build(
+                                    "basic_airship"
+                            )
+            );
 }

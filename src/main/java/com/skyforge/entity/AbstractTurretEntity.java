@@ -1,6 +1,7 @@
 package com.skyforge.entity;
 
 import com.skyforge.ai.combat.AimController;
+import com.skyforge.ai.combat.AimProfile;
 import com.skyforge.ai.combat.CombatPlatform;
 import com.skyforge.attack.AttackController;
 import com.skyforge.targeting.TargetingSystem;
@@ -9,15 +10,22 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
-public abstract class AbstractTurretEntity
-        extends Mob
-        implements CombatPlatform {
+import java.util.HashMap;
+import java.util.Map;
+
+public abstract class AbstractTurretEntity extends Mob implements CombatPlatform {
+
+    float bodyYaw, prevBodyYaw;
+    float turretYaw, prevTurretYaw;
+    float turretPitch, prevTurretPitch;
+    protected final Map<Integer, AimController> turrets = new HashMap<>();
+
+    protected Vec3 aimDirection =
+            new Vec3(0, 0, 1);
 
     protected TargetingSystem targeting;
 
     protected AttackController attackController;
-
-    protected AimController aimController;
 
     protected AbstractTurretEntity(
             EntityType<? extends Mob> type,
@@ -26,8 +34,7 @@ public abstract class AbstractTurretEntity
 
         super(type, level);
 
-        this.aimController =
-                new AimController(this);
+        initTurrets();
     }
 
     @Override
@@ -35,16 +42,22 @@ public abstract class AbstractTurretEntity
 
         super.tick();
 
-        if(level().isClientSide())
+        if (level().isClientSide())
             return;
 
-        if(targeting != null)
+        if (targeting != null)
             targeting.tick();
 
-        if(aimController != null)
-            aimController.tick();
+        LivingEntity target = getCombatTarget();
 
-        if(attackController != null)
+        if (target != null) {
+
+            for (AimController turret : turrets.values()) {
+                turret.tick(target);
+            }
+        }
+
+        if (attackController != null)
             attackController.tick();
     }
 
@@ -59,15 +72,19 @@ public abstract class AbstractTurretEntity
 
         return Vec3.ZERO;
     }
+    protected void initTurrets() {
+
+        turrets.put(0, new AimController(this, 0, AimProfile.HELICOPTER));
+    }
 
     @Override
-    public Vec3 getAimOrigin() {
+    public Vec3 getTurretOrigin(int id) {
 
-        return this.position().add(
-                0,
-                1.5,
-                0
-        );
+        return switch (id) {
+            case 0 -> position().add(0, 1.5, 0.5);
+            case 1 -> position().add(0, 1.5, -0.5);
+            default -> position();
+        };
     }
 
     @Override
@@ -105,11 +122,8 @@ public abstract class AbstractTurretEntity
         this.level()
                 .addFreshEntity(entity);
     }
-
-    @Override
-    public AimController getAimController() {
-
-        return aimController;
+    public AimController getAimController(int id) {
+        return turrets.get(id);
     }
 
     public TargetingSystem getTargetingSystem() {
@@ -120,5 +134,9 @@ public abstract class AbstractTurretEntity
     public AttackController getAttackController() {
 
         return attackController;
+    }
+    @Override
+    public int getTurretCount() {
+        return turrets.size();
     }
 }
