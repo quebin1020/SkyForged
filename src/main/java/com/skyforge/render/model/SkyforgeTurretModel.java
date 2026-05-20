@@ -23,7 +23,7 @@ public abstract class SkyforgeTurretModel<T extends AbstractTurretEntity & GeoAn
             final int id = i;
             getBone("turret_" + i).ifPresent(bone -> {
                 bone.setRotY((float) Math.toRadians(-entity.getTurretYaw(id)));
-                bone.setRotX((float) Math.toRadians(entity.getTurretPitch(id)));
+                bone.setRotX((float) Math.toRadians(-entity.getTurretPitch(id)));
             });
         }
     }
