@@ -6,7 +6,6 @@ import com.skyforge.event.ModEvents;
 import com.skyforge.item.ModItems;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
-
 import org.slf4j.Logger;
 
 @Mod(SkyforgeMod.MOD_ID)

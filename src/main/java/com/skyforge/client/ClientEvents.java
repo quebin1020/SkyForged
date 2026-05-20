@@ -4,7 +4,9 @@ import com.skyforge.entity.ModEntities;
 import com.skyforge.render.BasicAirshipRenderer;
 import com.skyforge.render.BasicPlaneRenderer;
 import com.skyforge.render.BasicTurretRenderer;
-import com.skyforge.render.DebugHelicopterRenderer;
+import com.skyforge.render.HelicopterRenderer;
+import com.skyforge.render.GunshipRenderer;
+import com.skyforge.render.ScoutRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -20,7 +22,7 @@ public class ClientEvents {
 
         event.registerEntityRenderer(
                 ModEntities.DEBUG_HELICOPTER.get(),
-                DebugHelicopterRenderer::new
+                HelicopterRenderer::new
         );
         event.registerEntityRenderer(
                 ModEntities.BASIC_PLANE.get(),
@@ -34,6 +36,16 @@ public class ClientEvents {
         event.registerEntityRenderer(
                 ModEntities.BASIC_TURRET.get(),
                 BasicTurretRenderer::new
+        );
+
+        event.registerEntityRenderer(
+                ModEntities.SCOUT.get(),
+                ScoutRenderer::new
+        );
+
+        event.registerEntityRenderer(
+                ModEntities.GUNSHIP.get(),
+                GunshipRenderer::new
         );
     }
 }

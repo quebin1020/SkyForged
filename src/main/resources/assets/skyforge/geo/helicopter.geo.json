@@ -1,0 +1,47 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.HelicopterModel",
+				"texture_width": 128,
+				"texture_height": 128,
+				"visible_bounds_width": 4,
+				"visible_bounds_height": 2.5,
+				"visible_bounds_offset": [0, 0.75, 0]
+			},
+			"bones": [
+				{
+					"name": "ROOT",
+					"pivot": [0, 0, -9]
+				},
+				{
+					"name": "body",
+					"parent": "ROOT",
+					"pivot": [0, 0, -9],
+					"cubes": [
+						{"origin": [-5, 0, -22], "size": [10, 12, 22], "uv": [64, 7]},
+						{"origin": [-1, 7, 0], "size": [2, 5, 24], "uv": [1, 41]}
+					]
+				},
+				{
+					"name": "rotor_main",
+					"parent": "ROOT",
+					"pivot": [0, 0, -9],
+					"cubes": [
+						{"origin": [-1, 12, -10], "size": [25, 2, 2], "uv": [1, 20]},
+						{"origin": [-24, 12, -10], "size": [25, 2, 2], "uv": [2, 30]}
+					]
+				},
+				{
+					"name": "turret_0",
+					"parent": "ROOT",
+					"pivot": [0, -1, -9],
+					"cubes": [
+						{"origin": [-1, -2, -18], "size": [2, 2, 10], "uv": [28, 95]}
+					]
+				}
+			]
+		}
+	]
+}

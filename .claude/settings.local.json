@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la /tmp/CreateBigCannons/forge/)",
+      "Bash(xargs grep -l \"AbstractCannonProjectile\\\\|CannonProjectile\")",
+      "Bash(xargs grep -l \"Projectile\")",
+      "Bash(xargs grep -l \"fire\\\\|spawn.*projectile\\\\|launch\")",
+      "WebSearch",
+      "WebFetch(domain:wiki.createmod.net)",
+      "Bash(cat /tmp/CreateBigCannons-1.21.1/gradle.properties)",
+      "Bash(jar xf *)",
+      "Bash(javap -c rbasamoyai/createbigcannons/index/CBCEntityTypes.class)",
+      "PowerShell(\"done\")",
+      "Bash(jar tf *)",
+      "Bash(javap rbasamoyai/createbigcannons/index/CBCEntityTypes.class)"
+    ]
+  }
+}

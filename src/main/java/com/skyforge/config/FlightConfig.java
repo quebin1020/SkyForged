@@ -11,6 +11,10 @@ public class FlightConfig {
     public boolean canRotateInPlace;
     public boolean requiresForwardMovement;
 
+    // Distancia mínima al suelo antes de hacer pull-up automático
+    // Solo relevante para AirplaneMovement. Default 15 bloques.
+    public float minTerrainClearance = 15f;
+
     public FlightConfig(
             float maxSpeed,
             float acceleration,

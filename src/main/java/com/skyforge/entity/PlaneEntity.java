@@ -56,6 +56,7 @@ public class PlaneEntity extends AbstractAerialEntity {
                 true,
                 true
         );
+        config.minTerrainClearance = 22f; // avión pesado vuela alto
 
         this.targeting = new TargetingSystem(this);
 

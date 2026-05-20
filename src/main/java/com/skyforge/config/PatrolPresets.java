@@ -96,6 +96,32 @@ public class PatrolPresets {
         return config;
     }
 
+    /**
+     * Scout — patrulla a baja altitud con cambios de dirección frecuentes.
+     * Radio corto (50-150) para dar sensación de velocidad.
+     */
+    public static PatrolConfig scout() {
+
+        PatrolConfig config = new PatrolConfig();
+
+        config.minDistance = 50;
+        config.maxDistance = 150;
+
+        config.maxAngleOffset = 55f;
+        config.forwardBias    = 0.9;
+        config.allowBehind    = false;
+        config.suddenTurnChance = 0.04;
+
+        config.preferredAltitude = 0;
+        config.verticalVariance  = 8;
+        config.minimumAltitude   = 70;
+        config.maximumAltitude   = 180;
+
+        config.followTerrain   = false;
+
+        return config;
+    }
+
     public static PatrolConfig boat() {
 
         PatrolConfig config =

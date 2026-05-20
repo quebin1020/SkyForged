@@ -10,8 +10,7 @@ public class AIStateMachine {
 
     protected final AbstractAerialEntity entity;
 
-    protected AIState currentState =
-            AIState.PATROL;
+    protected AIState currentState = AIState.PATROL;
 
     protected Vec3 patrolTarget;
 
@@ -23,176 +22,133 @@ public class AIStateMachine {
             AbstractAerialEntity entity,
             PatrolNavigator patrolNavigator
     ) {
-
         this.entity = entity;
-
-        this.patrolNavigator =
-                patrolNavigator;
+        this.patrolNavigator = patrolNavigator;
     }
 
     public void tick() {
-
         updateTransitions();
-
         stateTicks++;
 
-        switch(currentState) {
-
-            case IDLE -> idleTick();
-
+        switch (currentState) {
+            case IDLE   -> idleTick();
             case PATROL -> patrolTick();
-
-            case CHASE -> chaseTick();
-
+            case CHASE  -> chaseTick();
             case ATTACK -> attackTick();
-
-            case EVADE -> evadeTick();
+            case EVADE  -> evadeTick();
         }
     }
-    public Vec3 getPatrolTarget() {
 
+    public Vec3 getPatrolTarget() {
         return patrolTarget;
     }
 
-    /*
-        TRANSITIONS
-     */
+    // -------------------------------------------------------------------------
+    //  TRANSITIONS
+    // -------------------------------------------------------------------------
 
     protected void updateTransitions() {
 
-        LivingEntity target =
-                entity.getCombatTarget();
+        // FIX: una sola declaración, usando el sistema de targeting
+        LivingEntity target = entity.getTargetingSystem().getTarget();
 
-        if(target == null) {
-
+        if (target == null) {
             setState(AIState.PATROL);
-
             return;
         }
 
-        double distance =
-                entity.getCombatPosition()
-                        .distanceTo(
-                                target.position()
-                        );
+        double distance = entity.getCombatPosition()
+                .distanceTo(target.position());
 
-        switch(currentState) {
+        switch (currentState) {
 
             case PATROL -> {
-
-                setState(
-                        AIState.CHASE
-                );
+                // FIX: solo transiciona si hay target activo (ya verificado arriba)
+                setState(AIState.CHASE);
             }
 
             case CHASE -> {
-
-                if(distance < 60) {
-
-                    setState(
-                            AIState.ATTACK
-                    );
+                if (distance < 60) {
+                    setState(AIState.ATTACK);
                 }
             }
 
             case ATTACK -> {
-
-                if(distance > 90) {
-
-                    setState(
-                            AIState.CHASE
-                    );
+                if (distance > 90) {
+                    setState(AIState.CHASE);
                 }
             }
+
+            // IDLE y EVADE no tienen transición automática por ahora
+            default -> {}
         }
     }
 
-    /*
-        STATES
-     */
+    // -------------------------------------------------------------------------
+    //  STATES
+    // -------------------------------------------------------------------------
 
     protected void idleTick() {
     }
 
     protected void patrolTick() {
 
-        if(
-                patrolTarget == null
-                        ||
-                        entity.getCombatPosition()
-                                .distanceTo(
-                                        patrolTarget
-                                ) < 5
-        ) {
+        if (patrolTarget == null
+                || entity.getCombatPosition().distanceTo(patrolTarget) < 5) {
 
-            patrolTarget =
-                    patrolNavigator
-                            .generatePatrolPoint();
+            patrolTarget = patrolNavigator.generatePatrolPoint();
         }
 
-        entity.getMovementController()
-                .setTargetPosition(
-                        patrolTarget
-                );
+        entity.getMovementController().setTargetPosition(patrolTarget);
     }
 
     protected void chaseTick() {
 
-        LivingEntity target =
-                entity.getCombatTarget();
+        LivingEntity target = entity.getTargetingSystem().getTarget();
 
-        if(target == null)
-            return;
+        if (target == null) return;
 
-        entity.getMovementController()
-                .setTargetPosition(
-                        target.position()
-                );
+        entity.getMovementController().setTargetPosition(target.position());
     }
 
     protected void attackTick() {
 
-        LivingEntity target =
-                entity.getCombatTarget();
+        LivingEntity target = entity.getTargetingSystem().getTarget();
 
-        if(target == null)
-            return;
+        if (target == null) return;
 
-        CombatBehavior behavior =
-                entity.getCombatBehavior();
+        CombatBehavior behavior = entity.getCombatBehavior();
 
-        Vec3 attackPosition =
-                behavior.getAttackPosition(
-                        target
-                );
+        Vec3 attackPosition = behavior.getAttackPosition(target);
 
-        entity.getMovementController()
-                .setTargetPosition(
-                        attackPosition
-                );
+        entity.getMovementController().setTargetPosition(attackPosition);
     }
 
     protected void evadeTick() {
+
+        // FIX: código que estaba flotando fuera del método, ahora correctamente aquí
+        LivingEntity target = entity.getTargetingSystem().getTarget();
+
+        if (target == null) return;
+
+        Vec3 evadePosition = entity.getCombatBehavior().getAttackPosition(target);
+
+        entity.getMovementController().setTargetPosition(evadePosition);
     }
 
-    /*
-        HELPERS
-     */
+    // -------------------------------------------------------------------------
+    //  HELPERS
+    // -------------------------------------------------------------------------
 
-    protected void setState(
-            AIState state
-    ) {
+    protected void setState(AIState state) {
 
-        if(currentState == state)
-            return;
+        if (currentState == state) return;
 
         currentState = state;
-
         stateTicks = 0;
     }
 
     public AIState getState() {
-
         return currentState;
     }
 }

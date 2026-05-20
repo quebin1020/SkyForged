@@ -62,4 +62,18 @@ public class AimProfile {
             0.01,
             true
     );
+
+    /**
+     * Metralladora ligera (scout).
+     * Proyectil muy rápido → predicción simple.
+     * Tolerancia más amplia que AIRPLANE porque se dispara en ráfaga.
+     */
+    public static AimProfile MACHINE_GUN = new AimProfile(
+            false,   // fixed gun, el cuerpo de la nave apunta
+            0.0,
+            6.0,     // bala rápida
+            6.0,     // ~6° de tolerancia (ráfaga compensa la imprecisión)
+            0.04,    // leve dispersión tipo spread
+            true
+    );
 }
