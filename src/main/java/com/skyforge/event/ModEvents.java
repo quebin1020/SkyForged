@@ -1,6 +1,7 @@
 package com.skyforge.event;
 
 import com.skyforge.entity.*;
+import com.skyforge.entity.boss.BossGunshipEntity;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 
 public class ModEvents {
@@ -45,6 +46,11 @@ public class ModEvents {
         event.put(
                 ModEntities.BASIC_TURRET.get(),
                 BasicTurretEntity.createAttributes().build()
+        );
+
+        event.put(
+                ModEntities.BOSS_GUNSHIP.get(),
+                BossGunshipEntity.createAttributes().build()
         );
     }
 }

@@ -2,6 +2,7 @@ package com.skyforge.entity;
 
 import com.skyforge.ai.AIStateMachine;
 import com.skyforge.ai.PatrolNavigator;
+import com.skyforge.ai.combat.AimController;
 import com.skyforge.ai.combat.AimProfile;
 import com.skyforge.ai.combat.PlaneCombatBehavior;
 import com.skyforge.attack.PlaneAttackController;
@@ -39,6 +40,8 @@ public class PlaneEntity extends AbstractAerialEntity implements GeoEntity {
         // turret_1: cañón de ala der — AP (penetración)
         addTurret(0, AimProfile.AIRPLANE, CBCAmmoType.MACHINE_GUN_BULLET, new Vec3(-3.0, 0.5, 1.0));
         addTurret(1, AimProfile.AIRPLANE, CBCAmmoType.AP_SHOT,            new Vec3( 3.0, 0.5, 1.0));
+        // turret_2: compartimento de bombas (belly) — dispara HE_SHELL hacia abajo
+        addTurret(2, AimProfile.HELICOPTER, AimController.AimMode.FREE_TRACKING, CBCAmmoType.HE_SHELL, new Vec3(0, -0.5, 0.5));
         turretInit();
 
         // ── Sistemas de vuelo ─────────────────────────────────────────────────

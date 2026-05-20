@@ -1,6 +1,7 @@
 package com.skyforge.entity;
 
 import com.skyforge.SkyforgeMod;
+import com.skyforge.entity.boss.BossGunshipEntity;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -62,4 +63,10 @@ public class ModEntities {
                     .of(GunshipEntity::new, MobCategory.MONSTER)
                     .sized(7.0f, 4.0f)
                     .build("gunship"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<BossGunshipEntity>> BOSS_GUNSHIP =
+            ENTITIES.register("boss_gunship", () -> EntityType.Builder
+                    .of(BossGunshipEntity::new, MobCategory.MONSTER)
+                    .sized(21.0f, 11.0f)
+                    .build("boss_gunship"));
 }

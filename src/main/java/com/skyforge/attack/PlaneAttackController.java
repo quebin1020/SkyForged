@@ -9,6 +9,9 @@ import net.minecraft.world.phys.Vec3;
 /**
  * Ráfaga de ala fija. El avión apunta con el cuerpo; dispara durante la pasada.
  * Usa la munición asignada a turret_0 y turret_1 alternando en la ráfaga.
+ *
+ * Si el objetivo está significativamente por debajo y no hay alineación frontal,
+ * turret_2 (compartimento de bombas) lanza un HE_SHELL en trayectoria de mortero.
  */
 public class PlaneAttackController extends AttackController {
 
@@ -21,9 +24,16 @@ public class PlaneAttackController extends AttackController {
     private static final int BURST_RATE   = 2;
     private static final int RELOAD_TICKS = 70;
 
+    // Bomb drop (turret_2)
+    private static final double BOMB_RANGE_H  = 60.0;
+    private static final double BOMB_MIN_DY   = 8.0;
+    private static final float  BOMB_CHARGE   = 7.0f;
+    private static final int    BOMB_COOLDOWN = 100;
+
     private int burstRemaining = 0;
     private int burstTick      = 0;
     private int burstTurret    = 0;
+    private int bombCooldown   = 0;
 
     public PlaneAttackController(CombatPlatform platform) {
         super(platform);
@@ -31,6 +41,8 @@ public class PlaneAttackController extends AttackController {
 
     @Override
     protected void attackTick() {
+        if (bombCooldown > 0) bombCooldown--;
+
         LivingEntity target = getTarget();
         if (target == null) { burstRemaining = 0; return; }
 
@@ -50,11 +62,39 @@ public class PlaneAttackController extends AttackController {
 
         Vec3 forward  = platform.getCombatOwner().getLookAngle();
         Vec3 toTarget = target.position().subtract(platform.getCombatPosition()).normalize();
-        if (forward.dot(toTarget) < MIN_ALIGN) return;
 
-        burstRemaining = BURST_SIZE;
-        burstTick      = 0;
-        burstTurret    = 0;
+        if (forward.dot(toTarget) >= MIN_ALIGN) {
+            burstRemaining = BURST_SIZE;
+            burstTick      = 0;
+            burstTurret    = 0;
+        } else {
+            tryBombDrop(target);
+        }
+    }
+
+    private void tryBombDrop(LivingEntity target) {
+        if (bombCooldown > 0) return;
+
+        Vec3 myPos  = platform.getCombatPosition();
+        Vec3 tgtPos = target.position();
+
+        double dy = myPos.y - tgtPos.y;
+        if (dy < BOMB_MIN_DY) return;
+
+        double dxz = Math.sqrt(
+                (myPos.x - tgtPos.x) * (myPos.x - tgtPos.x) +
+                (myPos.z - tgtPos.z) * (myPos.z - tgtPos.z));
+        if (dxz > BOMB_RANGE_H) return;
+
+        if (!(platform.getCombatLevel() instanceof ServerLevel level)) return;
+
+        AimController bombBay = platform.getAimController(2);
+        if (bombBay == null) return;
+
+        Vec3 origin = platform.getTurretOrigin(2);
+        Vec3 dir    = tgtPos.add(0, 1, 0).subtract(origin).normalize();
+        bombBay.getAmmoType().fire(level, platform.getCombatOwner(), origin, dir, BOMB_CHARGE, 0.03f);
+        bombCooldown = BOMB_COOLDOWN;
     }
 
     private void fireBullet() {
