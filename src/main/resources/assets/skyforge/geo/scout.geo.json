@@ -1,0 +1,66 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.skyforge.scout",
+				"texture_width": 128,
+				"texture_height": 128,
+				"visible_bounds_width": 10,
+				"visible_bounds_height": 3,
+				"visible_bounds_offset": [0, 1, 0]
+			},
+			"bones": [
+				{
+					"name": "ROOT",
+					"pivot": [0, 0, 0]
+				},
+				{
+					"name": "fuselage",
+					"parent": "ROOT",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{"origin": [-12, 8, -80], "size": [24, 16, 128], "uv": [0, 0]},
+						{"origin": [-8, 10, -96], "size": [16, 12, 16], "uv": [0, 64]}
+					]
+				},
+				{
+					"name": "wings",
+					"parent": "ROOT",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{"origin": [-136, 8, -32], "size": [124, 6, 56], "uv": [0, 96]},
+						{"origin": [12, 8, -32], "size": [124, 6, 56], "uv": [0, 96]}
+					]
+				},
+				{
+					"name": "tail",
+					"parent": "ROOT",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{"origin": [-6, 12, 40], "size": [12, 32, 8], "uv": [64, 64]},
+						{"origin": [-40, 8, 40], "size": [80, 6, 8], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "engine",
+					"parent": "ROOT",
+					"pivot": [0, 16, -80],
+					"cubes": [
+						{"origin": [-10, 10, -88], "size": [20, 12, 16], "uv": [80, 64]},
+						{"origin": [-8, 12, -104], "size": [16, 8, 24], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "turret_0",
+					"parent": "ROOT",
+					"pivot": [0, 16, -64],
+					"cubes": [
+						{"origin": [-4, 10, -72], "size": [8, 8, 8], "uv": [80, 96]},
+						{"origin": [-3, 12, -104], "size": [6, 4, 40], "uv": [100, 80]}
+					]
+				}
+			]
+		}
+	]
+}

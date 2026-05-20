@@ -75,4 +75,6 @@ public abstract class FlightMovementController {
     public void setTargetPosition(Vec3 targetPosition) {
         this.targetPosition = targetPosition;
     }
+
+    public FlightConfig getConfig() { return config; }
 }

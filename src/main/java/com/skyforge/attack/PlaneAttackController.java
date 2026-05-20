@@ -1,36 +1,29 @@
 package com.skyforge.attack;
 
+import com.skyforge.ai.combat.AimController;
 import com.skyforge.ai.combat.CombatPlatform;
-import com.skyforge.integration.cbc.CBCProjectiles;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Nose guns de avión pesado — ráfaga sostenida de metralladora durante la pasada.
- *
- * Diferencia vs ScoutAttackController:
- *   Plane  — 12 rondas, 2 ticks entre rondas, carga 5.5 → fuego más denso y continuo
- *   Scout  —  8 rondas, 3 ticks entre rondas, carga 4.5 → más ágil pero menos volumen
- *
- * Ciclo: el PlaneCombatBehavior posiciona al avión en el FIRE_RUN.
- * Cuando el morro apunta al objetivo (dot > 0.96) se abre la ráfaga.
- * Tras la ráfaga hay una recarga larga mientras el avión vuelve a APPROACH.
+ * Ráfaga de ala fija. El avión apunta con el cuerpo; dispara durante la pasada.
+ * Usa la munición asignada a turret_0 y turret_1 alternando en la ráfaga.
  */
 public class PlaneAttackController extends AttackController {
 
-    // Metralladora ligera — misma munición que el scout pero más volumen
     private static final float  CHARGE       = 5.5f;
     private static final float  SPREAD       = 0.18f;
-    private static final double MIN_ALIGN    = 0.96;   // ~16°
+    private static final double MIN_ALIGN    = 0.96;
     private static final double MAX_RANGE    = 110.0;
 
-    private static final int BURST_SIZE   = 12;  // más balas que el scout (8)
-    private static final int BURST_RATE   = 2;   // más rápido que el scout (3)
+    private static final int BURST_SIZE   = 12;
+    private static final int BURST_RATE   = 2;
     private static final int RELOAD_TICKS = 70;
 
     private int burstRemaining = 0;
     private int burstTick      = 0;
+    private int burstTurret    = 0;
 
     public PlaneAttackController(CombatPlatform platform) {
         super(platform);
@@ -61,18 +54,27 @@ public class PlaneAttackController extends AttackController {
 
         burstRemaining = BURST_SIZE;
         burstTick      = 0;
+        burstTurret    = 0;
     }
 
     private void fireBullet() {
         if (!(platform.getCombatLevel() instanceof ServerLevel level)) return;
 
+        // Alterna entre torretas durante la ráfaga
+        int id = burstTurret % Math.max(1, platform.getTurretCount());
+        burstTurret++;
+
+        AimController turret = platform.getAimController(id);
+        if (turret == null) return;
+
+        // Dispara con spread adicional (vuelo frontal, no tracking libre)
         Vec3 dir = platform.getCombatOwner().getLookAngle().add(
                 (level.getRandom().nextDouble() - 0.5) * SPREAD,
                 (level.getRandom().nextDouble() - 0.5) * SPREAD,
                 (level.getRandom().nextDouble() - 0.5) * SPREAD
         ).normalize();
 
-        CBCProjectiles.fireMachineGunBullet(level, platform.getCombatOwner(),
-                platform.getTurretOrigin(0), dir, CHARGE, 0f);
+        Vec3 origin = platform.getTurretOrigin(id);
+        turret.getAmmoType().fire(level, platform.getCombatOwner(), origin, dir, CHARGE, 0f);
     }
 }

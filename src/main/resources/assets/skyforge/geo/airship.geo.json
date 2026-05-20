@@ -1,0 +1,105 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.skyforge.airship",
+				"texture_width": 128,
+				"texture_height": 128,
+				"visible_bounds_width": 14,
+				"visible_bounds_height": 9,
+				"visible_bounds_offset": [0, 3, 0]
+			},
+			"bones": [
+				{
+					"name": "ROOT",
+					"pivot": [0, 0, 0]
+				},
+				{
+					"name": "envelope",
+					"parent": "ROOT",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{"origin": [-80, 40, -96], "size": [160, 80, 192], "uv": [0, 0]},
+						{"origin": [-56, 112, -64], "size": [112, 16, 128], "uv": [0, 0]},
+						{"origin": [-56, 24, -64], "size": [112, 16, 128], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "gondola",
+					"parent": "ROOT",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{"origin": [-40, 0, -56], "size": [80, 32, 112], "uv": [0, 64]},
+						{"origin": [-36, -16, -40], "size": [72, 16, 80], "uv": [0, 96]}
+					]
+				},
+				{
+					"name": "ropes",
+					"parent": "ROOT",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{"origin": [-4, 24, -48], "size": [8, 16, 8], "uv": [0, 0]},
+						{"origin": [-4, 24,  40], "size": [8, 16, 8], "uv": [0, 0]},
+						{"origin": [-36, 24, -4], "size": [8, 16, 8], "uv": [0, 0]},
+						{"origin": [28, 24, -4], "size": [8, 16, 8], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "engine_left",
+					"parent": "ROOT",
+					"pivot": [-64, 48, 0],
+					"cubes": [
+						{"origin": [-80, 40, -16], "size": [24, 16, 32], "uv": [64, 64]},
+						{"origin": [-76, 44, -24], "size": [16, 8, 8], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "engine_right",
+					"parent": "ROOT",
+					"pivot": [64, 48, 0],
+					"cubes": [
+						{"origin": [56, 40, -16], "size": [24, 16, 32], "uv": [64, 64]},
+						{"origin": [60, 44, -24], "size": [16, 8, 8], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "turret_0",
+					"parent": "gondola",
+					"pivot": [-56, 16, 0],
+					"cubes": [
+						{"origin": [-68, 8, -12], "size": [24, 16, 24], "uv": [80, 96]},
+						{"origin": [-64, 12, -48], "size": [8, 4, 48], "uv": [100, 80]}
+					]
+				},
+				{
+					"name": "turret_1",
+					"parent": "gondola",
+					"pivot": [56, 16, 0],
+					"cubes": [
+						{"origin": [44, 8, -12], "size": [24, 16, 24], "uv": [80, 96]},
+						{"origin": [56, 12, -48], "size": [8, 4, 48], "uv": [100, 80]}
+					]
+				},
+				{
+					"name": "turret_2",
+					"parent": "gondola",
+					"pivot": [0, 16, 56],
+					"cubes": [
+						{"origin": [-12, 8, 44], "size": [24, 16, 24], "uv": [80, 96]},
+						{"origin": [-4, 12, 16], "size": [8, 4, 32], "uv": [100, 80]}
+					]
+				},
+				{
+					"name": "turret_3",
+					"parent": "gondola",
+					"pivot": [0, 16, -56],
+					"cubes": [
+						{"origin": [-12, 8, -68], "size": [24, 16, 24], "uv": [80, 96]},
+						{"origin": [-4, 12, -96], "size": [8, 4, 32], "uv": [100, 80]}
+					]
+				}
+			]
+		}
+	]
+}

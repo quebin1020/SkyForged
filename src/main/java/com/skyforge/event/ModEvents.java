@@ -1,9 +1,6 @@
 package com.skyforge.event;
 
 import com.skyforge.entity.*;
-import com.skyforge.entity.GunshipEntity;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 
 public class ModEvents {
@@ -47,20 +44,7 @@ public class ModEvents {
 
         event.put(
                 ModEntities.BASIC_TURRET.get(),
-
-                Mob.createMobAttributes()
-
-                        .add(
-                                Attributes.MAX_HEALTH,
-                                40
-                        )
-
-                        .add(
-                                Attributes.FOLLOW_RANGE,
-                                100
-                        )
-
-                        .build()
+                BasicTurretEntity.createAttributes().build()
         );
     }
 }

@@ -2,28 +2,22 @@ package com.skyforge.attack;
 
 import com.skyforge.ai.combat.AimController;
 import com.skyforge.ai.combat.CombatPlatform;
-import com.skyforge.integration.cbc.CBCProjectiles;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.phys.Vec3;
 
 /**
- * Airship — bombardeo de salva.
- *
- * Mecánica: dispara todas las torretas casi al mismo tiempo (1 tick entre cada una),
- * luego espera un cooldown largo antes de la siguiente salva.
- * Usa HE shells — destrucción de área desde altitud.
+ * Bombardeo de salva — todas las torretas disparan en secuencia.
+ * Cada torreta usa su propia munición asignada (turret.fire()).
  */
 public class AirshipAttackController extends AttackController {
 
     private static final float  CHARGE          = 3.0f;
-    private static final float  SPREAD          = 0.15f; // más spread, es bombardeo
+    private static final float  SPREAD          = 0.15f;
     private static final double MAX_RANGE        = 150;
-    private static final int    SALVO_COOLDOWN   = 80;   // 4s entre salvas
-    private static final int    INTER_SHOT_TICKS = 4;    // ticks entre cada torreta de la salva
+    private static final int    SALVO_COOLDOWN   = 80;
+    private static final int    INTER_SHOT_TICKS = 4;
 
-    // índice de torreta pendiente en salva activa (-1 = sin salva)
-    private int salvoIndex   = -1;
+    private int salvoIndex    = -1;
     private int interShotTick = 0;
 
     public AirshipAttackController(CombatPlatform platform) {
@@ -35,7 +29,6 @@ public class AirshipAttackController extends AttackController {
         LivingEntity target = getTarget();
         if (target == null) { salvoIndex = -1; return; }
 
-        // --- Salva en progreso ---
         if (salvoIndex >= 0) {
             if (interShotTick > 0) { interShotTick--; return; }
 
@@ -44,18 +37,14 @@ public class AirshipAttackController extends AttackController {
                 salvoIndex++;
                 interShotTick = INTER_SHOT_TICKS;
             } else {
-                // salva completa
                 salvoIndex = -1;
                 resetCooldown(SALVO_COOLDOWN);
             }
             return;
         }
 
-        // --- Iniciar nueva salva ---
         if (!canAttack()) return;
-
-        double distance = platform.getCombatPosition().distanceTo(target.position());
-        if (distance > MAX_RANGE) return;
+        if (platform.getCombatPosition().distanceTo(target.position()) > MAX_RANGE) return;
 
         salvoIndex    = 0;
         interShotTick = 0;
@@ -67,9 +56,7 @@ public class AirshipAttackController extends AttackController {
         AimController turret = platform.getAimController(id);
         if (turret == null || !turret.canShoot()) return;
 
-        Vec3 dir    = turret.applyInaccuracy(turret.getAimDirection());
-        Vec3 origin = platform.getTurretOrigin(id);
-
-        CBCProjectiles.fireHEShell(level, platform.getCombatOwner(), origin, dir, CHARGE, SPREAD);
+        // Cada torreta dispara su propia munición asignada
+        turret.fire(level, platform.getCombatOwner(), CHARGE, SPREAD);
     }
 }

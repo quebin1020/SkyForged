@@ -2,45 +2,52 @@ package com.skyforge.entity;
 
 import com.skyforge.ai.combat.AimProfile;
 import com.skyforge.attack.TurretAttackController;
+import com.skyforge.integration.cbc.CBCAmmoType;
 import com.skyforge.targeting.TargetingSystem;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
-import com.skyforge.ai.combat.AimController;
+import net.minecraft.world.phys.Vec3;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class BasicTurretEntity extends AbstractTurretEntity {
+/**
+ * Torreta estática de dos cañones. Sin movimiento.
+ * turret_0: cañón delantero — HE shell
+ * turret_1: cañón trasero  — Solid Shot defensivo
+ */
+public class BasicTurretEntity extends AbstractTurretEntity implements GeoEntity {
 
-    public BasicTurretEntity(
-            EntityType<? extends Mob> type,
-            Level level
-    ) {
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
+    public BasicTurretEntity(EntityType<? extends Mob> type, Level level) {
         super(type, level);
 
-        this.targeting =
-                new TargetingSystem(this);
+        // ── Torretas ──────────────────────────────────────────────────────────
+        // Perfil TURRET: aimSpeed 0.08, projectileSpeed 3.0, tolerance 6°, inaccuracy 0.03
+        addTurret(0, AimProfile.TURRET, CBCAmmoType.HE_SHELL,   new Vec3(0, 1.5,  0.5));
+        addTurret(1, AimProfile.TURRET, CBCAmmoType.SOLID_SHOT, new Vec3(0, 1.5, -0.5));
+        turretInit();
 
-        this.attackController =
-                new TurretAttackController(this);
-        initTurrets();
-
+        this.targeting        = new TargetingSystem(this);
+        this.attackController = new TurretAttackController(this);
     }
-    protected void initTurrets() {
 
-        AimController t0 = new AimController(this, 0, AimProfile.HELICOPTER);
-        AimController t1 = new AimController(this, 1, AimProfile.HELICOPTER);
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar registrar) {
+        // Sin animación de movimiento — la rotación la controla GeckoLib via EntityData
+    }
 
-        t0.setAimSpeed(0.08);
-        t0.setProjectileSpeed(3);
-        t0.setFiringTolerance(6);
-        t0.setBaseInaccuracy(0.03);
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() { return cache; }
 
-        t1.setAimSpeed(0.08);
-        t1.setProjectileSpeed(3);
-        t1.setFiringTolerance(6);
-        t1.setBaseInaccuracy(0.03);
-
-        turrets.put(0, t0);
-        turrets.put(1, t1);
+    public static AttributeSupplier.Builder createAttributes() {
+        return Mob.createMobAttributes()
+                .add(Attributes.MAX_HEALTH,   40.0)
+                .add(Attributes.FOLLOW_RANGE, 100.0);
     }
 }

@@ -1,0 +1,76 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.skyforge.airplane",
+				"texture_width": 128,
+				"texture_height": 128,
+				"visible_bounds_width": 14,
+				"visible_bounds_height": 3,
+				"visible_bounds_offset": [0, 1, 0]
+			},
+			"bones": [
+				{
+					"name": "ROOT",
+					"pivot": [0, 0, 0]
+				},
+				{
+					"name": "fuselage",
+					"parent": "ROOT",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{"origin": [-16, 8, -112], "size": [32, 24, 192], "uv": [0, 0]},
+						{"origin": [-12, 12, -128], "size": [24, 16, 16], "uv": [0, 64]}
+					]
+				},
+				{
+					"name": "wings",
+					"parent": "ROOT",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{"origin": [-224, 8, -48], "size": [208, 8, 80], "uv": [0, 96]},
+						{"origin": [16, 8, -48], "size": [208, 8, 80], "uv": [0, 96]}
+					]
+				},
+				{
+					"name": "tail",
+					"parent": "ROOT",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{"origin": [-8, 16, 72], "size": [16, 48, 8], "uv": [64, 64]},
+						{"origin": [-56, 8, 72], "size": [112, 8, 8], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "propeller",
+					"parent": "ROOT",
+					"pivot": [0, 20, -120],
+					"cubes": [
+						{"origin": [-6, 16, -124], "size": [12, 8, 8], "uv": [80, 80]},
+						{"origin": [-4, 16, -126], "size": [8, 56, 4], "uv": [0, 0]},
+						{"origin": [-4, -24, -126], "size": [8, 56, 4], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "turret_0",
+					"parent": "ROOT",
+					"pivot": [-48, 16, -32],
+					"cubes": [
+						{"origin": [-52, 12, -40], "size": [8, 8, 8], "uv": [80, 96]},
+						{"origin": [-50, 14, -80], "size": [4, 4, 48], "uv": [100, 80]}
+					]
+				},
+				{
+					"name": "turret_1",
+					"parent": "ROOT",
+					"pivot": [48, 16, -32],
+					"cubes": [
+						{"origin": [44, 12, -40], "size": [8, 8, 8], "uv": [80, 96]},
+						{"origin": [46, 14, -80], "size": [4, 4, 48], "uv": [100, 80]}
+					]
+				}
+			]
+		}
+	]
+}

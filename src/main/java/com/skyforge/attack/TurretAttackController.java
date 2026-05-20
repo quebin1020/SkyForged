@@ -1,68 +1,49 @@
 package com.skyforge.attack;
 
-import com.skyforge.ai.combat.CombatPlatform;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.SmallFireball;
-import net.minecraft.world.phys.Vec3;
 import com.skyforge.ai.combat.AimController;
+import com.skyforge.ai.combat.CombatPlatform;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.LivingEntity;
 
-public class TurretAttackController
-        extends AttackController {
+/**
+ * Controlador de torreta estática. Dispara alternando torretas.
+ * Usa la munición asignada a cada torreta (turret.fire()).
+ */
+public class TurretAttackController extends AttackController {
 
-    public TurretAttackController(
-            CombatPlatform platform
-    ) {
+    private static final float  CHARGE    = 3.5f;
+    private static final float  SPREAD    = 0.06f;
+    private static final double MAX_RANGE = 80.0;
+    private static final int    COOLDOWN  = 10;
 
+    private int turretIndex = 0;
+
+    public TurretAttackController(CombatPlatform platform) {
         super(platform);
     }
+
     @Override
     protected void attackTick() {
-
         LivingEntity target = getTarget();
+        if (target == null) return;
 
-        if (target == null)
-            return;
+        if (platform.getCombatPosition().distanceTo(target.position()) > MAX_RANGE) return;
+        if (!canAttack()) return;
 
-        double distance = platform.getCombatPosition()
-                .distanceTo(target.position());
-
-        if (distance > 80)
-            return;
-
-        for (int id = 0; id < 2; id++) { // o turrets.size()
+        // Busca la siguiente torreta que puede disparar
+        int count = platform.getTurretCount();
+        for (int attempt = 0; attempt < count; attempt++) {
+            int id = turretIndex % Math.max(1, count);
+            turretIndex++;
 
             AimController turret = platform.getAimController(id);
+            if (turret == null || !turret.canShoot()) continue;
 
-            if (turret == null)
-                continue;
+            if (!(platform.getCombatLevel() instanceof ServerLevel level)) break;
 
-            if (!canAttack())
-                continue;
-
-            if (!turret.canShoot())
-                continue;
-
-            resetCooldown(10);
-
-            Vec3 direction = turret.getAimDirection();
-            direction = turret.applyInaccuracy(direction);
-            direction = direction.scale(3);
-
-            Vec3 origin = platform.getTurretOrigin(id);
-
-            SmallFireball fireball = new SmallFireball(
-                    platform.getCombatLevel(),
-                    origin.x,
-                    origin.y,
-                    origin.z,
-                    direction
-            );
-
-            fireball.setOwner(platform.getCombatOwner());
-
-            platform.spawnCombatEntity(fireball);
-
-            break; // evita que todos disparen en el mismo tick
+            turret.fire(level, platform.getCombatOwner(), CHARGE, SPREAD);
+            resetCooldown(COOLDOWN);
+            break;
         }
     }
 }

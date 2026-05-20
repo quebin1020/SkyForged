@@ -1,0 +1,23 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.airship.engine_idle": {
+			"loop": true,
+			"animation_length": 1.0,
+			"bones": {
+				"engine_left": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"1.0": [0, -360, 0]
+					}
+				},
+				"engine_right": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"1.0": [0, 360, 0]
+					}
+				}
+			}
+		}
+	}
+}

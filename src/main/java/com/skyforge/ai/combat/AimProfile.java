@@ -76,4 +76,14 @@ public class AimProfile {
             0.04,    // leve dispersión tipo spread
             true
     );
+
+    /**
+     * Modo de apuntado por defecto derivado del perfil.
+     * canRotate=true  → FREE_TRACKING
+     * canRotate=false → FIXED_GUN
+     * Usar la sobrecarga de addTurret con AimMode explícito para LIMITED_TURN.
+     */
+    public AimController.AimMode defaultAimMode() {
+        return canRotate ? AimController.AimMode.FREE_TRACKING : AimController.AimMode.FIXED_GUN;
+    }
 }

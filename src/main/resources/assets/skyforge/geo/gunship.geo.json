@@ -1,0 +1,92 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.skyforge.gunship",
+				"texture_width": 128,
+				"texture_height": 128,
+				"visible_bounds_width": 12,
+				"visible_bounds_height": 6,
+				"visible_bounds_offset": [0, 2.5, 0]
+			},
+			"bones": [
+				{
+					"name": "ROOT",
+					"pivot": [0, 0, 0]
+				},
+				{
+					"name": "body",
+					"parent": "ROOT",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{"origin": [-56, 8, -96], "size": [112, 56, 144], "uv": [0, 0]},
+						{"origin": [-36, 16, -120], "size": [72, 40, 24], "uv": [0, 64]},
+						{"origin": [-64, 0, -80], "size": [10, 10, 112], "uv": [0, 0]},
+						{"origin": [54, 0, -80], "size": [10, 10, 112], "uv": [0, 0]},
+						{"origin": [-64, 10, -56], "size": [10, 24, 10], "uv": [0, 0]},
+						{"origin": [54, 10, -56], "size": [10, 24, 10], "uv": [0, 0]},
+						{"origin": [-64, 10, 24], "size": [10, 24, 10], "uv": [0, 0]},
+						{"origin": [54, 10, 24], "size": [10, 24, 10], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "tail",
+					"parent": "ROOT",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{"origin": [-10, 28, 48], "size": [20, 20, 96], "uv": [64, 64]},
+						{"origin": [-8, 28, 136], "size": [16, 56, 10], "uv": [64, 0]},
+						{"origin": [-56, 32, 136], "size": [112, 10, 10], "uv": [0, 96]}
+					]
+				},
+				{
+					"name": "rotor_main",
+					"parent": "ROOT",
+					"pivot": [0, 72, 0],
+					"cubes": [
+						{"origin": [-12, 68, -12], "size": [24, 10, 24], "uv": [80, 80]},
+						{"origin": [12, 70, -8], "size": [108, 4, 16], "uv": [0, 0]},
+						{"origin": [-120, 70, -8], "size": [108, 4, 16], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "turret_0",
+					"parent": "ROOT",
+					"pivot": [-24, 32, -64],
+					"cubes": [
+						{"origin": [-36, 24, -72], "size": [24, 16, 16], "uv": [80, 96]},
+						{"origin": [-28, 28, -104], "size": [8, 4, 40], "uv": [100, 80]}
+					]
+				},
+				{
+					"name": "turret_1",
+					"parent": "ROOT",
+					"pivot": [24, 32, -64],
+					"cubes": [
+						{"origin": [12, 24, -72], "size": [24, 16, 16], "uv": [80, 96]},
+						{"origin": [20, 28, -104], "size": [8, 4, 40], "uv": [100, 80]}
+					]
+				},
+				{
+					"name": "turret_2",
+					"parent": "ROOT",
+					"pivot": [-48, 24, 0],
+					"cubes": [
+						{"origin": [-60, 16, -12], "size": [24, 16, 24], "uv": [80, 96]},
+						{"origin": [-56, 20, -52], "size": [8, 4, 48], "uv": [100, 80]}
+					]
+				},
+				{
+					"name": "turret_3",
+					"parent": "ROOT",
+					"pivot": [48, 24, 0],
+					"cubes": [
+						{"origin": [36, 16, -12], "size": [24, 16, 24], "uv": [80, 96]},
+						{"origin": [40, 20, -52], "size": [8, 4, 48], "uv": [100, 80]}
+					]
+				}
+			]
+		}
+	]
+}

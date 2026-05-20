@@ -3,42 +3,69 @@
 	"minecraft:geometry": [
 		{
 			"description": {
-				"identifier": "geometry.HelicopterModel",
+				"identifier": "geometry.skyforge.helicopter",
 				"texture_width": 128,
 				"texture_height": 128,
-				"visible_bounds_width": 4,
-				"visible_bounds_height": 2.5,
-				"visible_bounds_offset": [0, 0.75, 0]
+				"visible_bounds_width": 10,
+				"visible_bounds_height": 5,
+				"visible_bounds_offset": [0, 2, 0]
 			},
 			"bones": [
 				{
 					"name": "ROOT",
-					"pivot": [0, 0, -9]
+					"pivot": [0, 0, 0]
 				},
 				{
 					"name": "body",
 					"parent": "ROOT",
-					"pivot": [0, 0, -9],
+					"pivot": [0, 0, 0],
 					"cubes": [
-						{"origin": [-5, 0, -22], "size": [10, 12, 22], "uv": [64, 7]},
-						{"origin": [-1, 7, 0], "size": [2, 5, 24], "uv": [1, 41]}
+						{"origin": [-48, 8, -80], "size": [96, 48, 128], "uv": [0, 0]},
+						{"origin": [-28, 16, -104], "size": [56, 32, 24], "uv": [0, 64]},
+						{"origin": [-56, 0, -64], "size": [8, 8, 96], "uv": [0, 0]},
+						{"origin": [48, 0, -64], "size": [8, 8, 96], "uv": [0, 0]},
+						{"origin": [-56, 8, -40], "size": [8, 20, 8], "uv": [0, 0]},
+						{"origin": [48, 8, -40], "size": [8, 20, 8], "uv": [0, 0]},
+						{"origin": [-56, 8, 24], "size": [8, 20, 8], "uv": [0, 0]},
+						{"origin": [48, 8, 24], "size": [8, 20, 8], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "tail",
+					"parent": "ROOT",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{"origin": [-8, 24, 48], "size": [16, 16, 80], "uv": [64, 64]},
+						{"origin": [-6, 24, 120], "size": [12, 48, 8], "uv": [64, 0]},
+						{"origin": [-48, 28, 120], "size": [96, 8, 8], "uv": [0, 96]}
 					]
 				},
 				{
 					"name": "rotor_main",
 					"parent": "ROOT",
-					"pivot": [0, 0, -9],
+					"pivot": [0, 64, 0],
 					"cubes": [
-						{"origin": [-1, 12, -10], "size": [25, 2, 2], "uv": [1, 20]},
-						{"origin": [-24, 12, -10], "size": [25, 2, 2], "uv": [2, 30]}
+						{"origin": [-10, 60, -10], "size": [20, 8, 20], "uv": [80, 80]},
+						{"origin": [10, 62, -8], "size": [110, 4, 16], "uv": [0, 0]},
+						{"origin": [-120, 62, -8], "size": [110, 4, 16], "uv": [0, 0]}
 					]
 				},
 				{
 					"name": "turret_0",
 					"parent": "ROOT",
-					"pivot": [0, -1, -9],
+					"pivot": [0, 28, -56],
 					"cubes": [
-						{"origin": [-1, -2, -18], "size": [2, 2, 10], "uv": [28, 95]}
+						{"origin": [-12, 20, -64], "size": [24, 16, 16], "uv": [80, 96]},
+						{"origin": [-3, 24, -96], "size": [6, 4, 40], "uv": [100, 80]}
+					]
+				},
+				{
+					"name": "turret_1",
+					"parent": "ROOT",
+					"pivot": [0, 28, 8],
+					"cubes": [
+						{"origin": [-12, 20, 0], "size": [24, 16, 16], "uv": [80, 96]},
+						{"origin": [-3, 24, -32], "size": [6, 4, 40], "uv": [100, 80]}
 					]
 				}
 			]
