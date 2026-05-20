@@ -56,8 +56,8 @@ public abstract class FlightMovementController {
 
         double speed = velocity.length();
 
-        if (speed > config.maxSpeed) {
-            velocity = velocity.normalize().scale(config.maxSpeed);
+        if (speed > config.effectiveMaxSpeed()) {
+            velocity = velocity.normalize().scale(config.effectiveMaxSpeed());
         }
 
         entity.setDeltaMovement(velocity);

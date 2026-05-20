@@ -9,6 +9,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+
 /**
  * Tamaños de hitbox — referencia de modelo en bloques (16 unidades = 1 bloque):
  *
@@ -69,4 +70,32 @@ public class ModEntities {
                     .of(BossGunshipEntity::new, MobCategory.MONSTER)
                     .sized(21.0f, 11.0f)
                     .build("boss_gunship"));
+
+    // bomber  ~14 envergadura, 3 alto
+    public static final DeferredHolder<EntityType<?>, EntityType<BomberEntity>> BOMBER =
+            ENTITIES.register("bomber", () -> EntityType.Builder
+                    .of(BomberEntity::new, MobCategory.MONSTER)
+                    .sized(14.0f, 3.0f)
+                    .build("bomber"));
+
+    // missile helicopter  ~8 ancho, 4 alto
+    public static final DeferredHolder<EntityType<?>, EntityType<MissileHelicopterEntity>> MISSILE_HELICOPTER =
+            ENTITIES.register("missile_helicopter", () -> EntityType.Builder
+                    .of(MissileHelicopterEntity::new, MobCategory.MONSTER)
+                    .sized(8.0f, 4.0f)
+                    .build("missile_helicopter"));
+
+    // light dropship  ~7 ancho, 5 alto
+    public static final DeferredHolder<EntityType<?>, EntityType<DropshipEntity>> DROPSHIP =
+            ENTITIES.register("dropship", () -> EntityType.Builder
+                    .of(DropshipEntity::new, MobCategory.MONSTER)
+                    .sized(7.0f, 5.0f)
+                    .build("dropship"));
+
+    // heavy dropship  ~10 ancho, 7 alto
+    public static final DeferredHolder<EntityType<?>, EntityType<HeavyDropshipEntity>> HEAVY_DROPSHIP =
+            ENTITIES.register("heavy_dropship", () -> EntityType.Builder
+                    .of(HeavyDropshipEntity::new, MobCategory.MONSTER)
+                    .sized(10.0f, 7.0f)
+                    .build("heavy_dropship"));
 }

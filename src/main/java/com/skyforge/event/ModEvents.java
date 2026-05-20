@@ -52,5 +52,25 @@ public class ModEvents {
                 ModEntities.BOSS_GUNSHIP.get(),
                 BossGunshipEntity.createAttributes().build()
         );
+
+        event.put(
+                ModEntities.BOMBER.get(),
+                BomberEntity.createAttributes().build()
+        );
+
+        event.put(
+                ModEntities.MISSILE_HELICOPTER.get(),
+                MissileHelicopterEntity.createAttributes().build()
+        );
+
+        event.put(
+                ModEntities.DROPSHIP.get(),
+                DropshipEntity.createAttributes().build()
+        );
+
+        event.put(
+                ModEntities.HEAVY_DROPSHIP.get(),
+                HeavyDropshipEntity.createAttributes().build()
+        );
     }
 }

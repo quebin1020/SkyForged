@@ -14,6 +14,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -174,9 +175,14 @@ public abstract class AbstractAerialEntity extends Mob implements CombatPlatform
         }
 
         if (attackController != null) attackController.tick();
-        if (movement != null)         movement.tick();
 
-        this.move(MoverType.SELF, this.getDeltaMovement());
+        if (movement != null) {
+            movement.tick();
+            this.move(MoverType.SELF, this.getDeltaMovement());
+        } else {
+            // Turrets and static entities: zero velocity so they don't drift
+            setDeltaMovement(Vec3.ZERO);
+        }
     }
 
     /**
@@ -207,6 +213,34 @@ public abstract class AbstractAerialEntity extends Mob implements CombatPlatform
     }
 
     // ── CombatPlatform ────────────────────────────────────────────────────────
+
+    // ── Damage / death ────────────────────────────────────────────────────────
+
+    /** No knockback — aerial entities hold their flight path when hit. */
+    @Override
+    public void knockback(double strength, double x, double z) { }
+
+    /** Preserve velocity so a hit doesn't change the flight path. */
+    @Override
+    protected void actuallyHurt(DamageSource source, float amount) {
+        Vec3 vel = getDeltaMovement();
+        super.actuallyHurt(source, amount);
+        if (movement != null) setDeltaMovement(vel);
+    }
+
+    /** Skip the 20-tick death animation: spawn an explosion and vanish. */
+    @Override
+    protected void tickDeath() {
+        if (this.deathTime == 0 && !level().isClientSide()) {
+            level().explode(this, getX(), getY(), getZ(),
+                    getDeathExplosionRadius(), Level.ExplosionInteraction.NONE);
+        }
+        ++this.deathTime;
+        if (this.deathTime >= 3) this.discard();
+    }
+
+    /** Override in subclasses to change the death-explosion size. */
+    protected float getDeathExplosionRadius() { return 3.0f; }
 
     @Override public AimController getAimController(int id) { return turrets.get(id); }
     @Override public int getTurretCount()                    { return turrets.size(); }

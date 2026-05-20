@@ -149,7 +149,7 @@ public class HelicopterMovement
                 );
 
         double targetSpeed =
-                config.maxSpeed
+                config.effectiveMaxSpeed()
                         * speedFactor;
 
         Vec3 desiredHorizontalVelocity =
@@ -254,10 +254,10 @@ public class HelicopterMovement
                                 finalVelocity.z * finalVelocity.z
                 );
 
-        if(horizontalSpeed > config.maxSpeed) {
+        if(horizontalSpeed > config.effectiveMaxSpeed()) {
 
             double scale =
-                    config.maxSpeed
+                    config.effectiveMaxSpeed()
                             / horizontalSpeed;
 
             finalVelocity =

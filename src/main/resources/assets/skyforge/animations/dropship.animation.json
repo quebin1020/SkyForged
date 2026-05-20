@@ -1,0 +1,17 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.dropship.rotor_spin": {
+			"loop": true,
+			"animation_length": 0.6,
+			"bones": {
+				"rotor_main": {
+					"rotation": {
+						"0.0": [0,   0, 0],
+						"0.6": [0, 360, 0]
+					}
+				}
+			}
+		}
+	}
+}

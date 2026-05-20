@@ -11,6 +11,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -120,9 +121,29 @@ public abstract class AbstractTurretEntity extends Mob implements CombatPlatform
     // ── Tick ─────────────────────────────────────────────────────────────────
 
     @Override
+    public void knockback(double strength, double x, double z) { }
+
+    @Override
+    protected void actuallyHurt(DamageSource source, float amount) {
+        Vec3 vel = getDeltaMovement();
+        super.actuallyHurt(source, amount);
+        setDeltaMovement(vel);
+    }
+
+    @Override
+    protected void tickDeath() {
+        if (this.deathTime == 0 && !level().isClientSide()) {
+            level().explode(this, getX(), getY(), getZ(), 2.5f, Level.ExplosionInteraction.NONE);
+        }
+        ++this.deathTime;
+        if (this.deathTime >= 3) this.discard();
+    }
+
+    @Override
     public void tick() {
         super.tick();
         if (level().isClientSide()) return;
+        setDeltaMovement(Vec3.ZERO);   // turrets are static
 
         if (targeting != null) targeting.tick();
 
